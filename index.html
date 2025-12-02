@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Neon Spinner - v7</title>
+
+  <link rel="icon" type="image/png" href="favicon.png" />
+
+  <!-- CSS Core & Animations -->
+  <link rel="stylesheet" href="css/core.css">
+  <link rel="stylesheet" href="css/animations.css">
+
+  <!-- CSS UI & Game -->
+  <link rel="stylesheet" href="css/ui.css">
+  <link rel="stylesheet" href="css/game.css">
+
+  <!-- CSS Modules -->
+  <link rel="stylesheet" href="css/modules/auth.css">
+  <link rel="stylesheet" href="css/modules/menus.css">
+  <link rel="stylesheet" href="css/modules/inventory.css">
+  <link rel="stylesheet" href="css/battlepass.css">
+  <meta name="robots" content="noindex" />
+</head>
+
+<body>
+
+  <div id="maintenance-overlay" role="alert" aria-live="assertive" aria-label="Servidores en mantenimiento">
+    <div class="m-wrap">
+      <h1 id="maintenance-title">Neon Spinner</h1><br>
+      <div class="m-logo" aria-hidden="true">
+        <div class="spinner"></div>
+      </div>
+      <h1>Servidores en mantenimiento</h1>
+      <p>Gracias por tu paciencia — volvemos pronto.</p>
+      <small>Si necesitas asistencia, contacta con soporte.</small>
+    </div>
+  </div>
+
+
+  <!-- ========================================
+       PANEL DE AUTENTICACIÓN (overlay modal)
+  ========================================= -->
+  <div id="auth-overlay" class="auth-overlay" aria-hidden="true">
+    <div class="auth-card" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+      <h2 id="auth-title">Inicia sesión o regístrate</h2>
+
+      <input id="auth-username" placeholder="Usuario" autocomplete="username" />
+      <input id="auth-password" placeholder="Contraseña" type="password" autocomplete="current-password" />
+
+      <div class="auth-row">
+        <button id="auth-login" class="btn" type="button">
+          Iniciar sesión
+        </button>
+        <button id="auth-register" class="btn btn-alt" type="button">
+          Registrar
+        </button>
+      </div>
+
+      <div id="auth-msg" class="auth-msg"></div>
+      <small>Necesitas una cuenta para poder jugar.</small>
+    </div>
+  </div>
+
+  <!-- ========================================
+       HUD SUPERIOR / MENÚ IZQUIERDA
+  ========================================= -->
+
+  <!-- Panel superior izquierdo: botón Clasificación + mini estado de sesión -->
+  <div id="top-left-menu" class="top-left-menu">
+    <button id="menu-leaderboard-btn" class="btn small" type="button">
+      Clasificación
+    </button>
+    <div id="auth-mini" class="auth-mini"></div>
+  </div>
+
+  <!-- ========================================
+       MODAL CLASIFICACIÓN (2 TABLAS)
+  ========================================= -->
+  <div id="leaderboard-panel" class="leaderboard-panel" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="lb-header">
+      <strong>Clasificación</strong>
+      <button id="close-leaderboard" type="button" aria-label="Cerrar clasificación" class="close-x">
+        &times;
+      </button>
+    </div>
+
+    <div class="lb-tables">
+      <div class="lb-block">
+        <h4>Modo Huida</h4>
+        <table id="lb-huida" class="lb-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Usuario</th>
+              <th>Huida</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="lb-block">
+        <h4>Modo Destrucción</h4>
+        <table id="lb-destruccion" class="lb-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Usuario</th>
+              <th>Destrucción</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================
+       HUD: FONDO, FPS, BARRA, SCORE
+  ========================================= -->
+
+  <!-- Fondo de estrellas -->
+  <canvas id="stars" class="bg-canvas" aria-hidden="true"></canvas>
+
+  <!-- FPS -->
+  <h1 id="FPS" aria-live="polite"></h1>
+
+  <!-- Barra de progreso (tiempo / progreso) -->
+  <div id="progress-container" aria-hidden="true">
+    <div id="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+    <span id="progress-text"></span>
+  </div>
+
+  <!-- Marcadores de puntuación -->
+  <div id="score-record" aria-hidden="true">
+    <span id="score" class="hidden"></span>
+    <span id="record" class="hidden"></span>
+  </div>
+
+  <!-- ========================================
+       MENÚ PRINCIPAL
+  ========================================= -->
+  <main id="mainmenu" role="dialog" aria-modal="true">
+    <h1>Neon Spinner</h1>
+
+    <button id="playbtn" type="button">
+      Jugar
+    </button>
+    <br>
+
+    <button id="battlepass-btn" class="menu-btn battlepass">Trayectoria Estelar</button>
+    <br>
+
+    <button id="inventorybtn" type="button">
+      Inventario
+    </button>
+  </main>
+
+  <!-- ===========================
+     MENÚ DE SELECCIÓN DE MODO
+============================== -->
+  <div id="mode-select-menu" role="dialog" aria-modal="true">
+
+    <div class="mode-select-layout">
+
+      <!-- IZQUIERDA: Legacy -->
+      <div class="mode-left">
+        <button id="mode-legacy-btn" class="mode-btn" aria-haspopup="true" aria-expanded="false">
+          Versiones Legacy
+        </button>
+
+        <div id="mode-legacy-menu" role="menu" aria-hidden="true"></div>
+      </div>
+
+      <!-- CENTRO: Huida -->
+      <div class="mode-center">
+        <button id="play-huida" class="mode-btn main">
+          Modo Huida
+        </button>
+      </div>
+
+      <!-- DERECHA: Destrucción -->
+      <div class="mode-right">
+        <div id="mode-btn-wrap">
+          <button id="play-destruction" class="mode-btn">
+            Modo Destrucción
+          </button>
+          <div id="new-text">Nuevo!</div>
+        </div>
+      </div>
+
+    </div>
+
+    <button id="close-mode-menu" aria-label="Cerrar menú modos">&times;</button>
+  </div>
+
+  <!-- ========================================
+       MODAL PASE DE BATALLA
+  ========================================= -->
+  <div id="battlepass-modal" class="modal" style="display: none;">
+    <div class="modal-content bp-content">
+      <span id="close-bp-btn" class="close-btn">&times;</span>
+      <h2>TRAYECTORIA ESTELAR</h2>
+      <div id="bp-grid" class="bp-grid-container">
+        <!-- Se genera dinámicamente en battlepass.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================
+       INVENTARIO (SKINS + COLOR)
+  ========================================= -->
+  <div id="inventory-modal" role="dialog" aria-modal="true" aria-labelledby="skin-name">
+    <div class="inventory-layout">
+      <section class="inventory-left" aria-label="Selector de skins y color">
+        <div class="inventory-tabs">
+          <button id="tab-skins" type="button" class="inventory-tab active">
+            Skins
+          </button>
+          <button id="tab-color" type="button" class="inventory-tab">
+            Color
+          </button>
+        </div>
+
+        <div id="skins-panel">
+          <div id="skins-list"></div>
+        </div>
+
+        <div id="color-panel">
+          <label for="color-picker">Color de la skin</label>
+          <input id="color-picker" type="color" value="#00eaff" />
+          <div class="color-help-text">
+            Elige el color de tu skin
+          </div>
+        </div>
+      </section>
+
+      <section class="inventory-right" aria-label="Vista previa de skin seleccionada">
+        <div id="big-skin-view">?</div>
+        <span id="skin-name" class="skin-name"></span>
+      </section>
+    </div>
+
+    <button id="close-inventory" type="button" aria-label="Cerrar inventario">
+      &times;
+    </button>
+  </div>
+
+  <!-- ========================================
+       GAME OVER
+  ========================================= -->
+  <div id="gameover" role="alert" aria-hidden="true">
+    GAME OVER<br />
+    <button id="retry" type="button">
+      Reintentar
+    </button>
+    <button id="backmenu" type="button">
+      Volver al menú
+    </button>
+    <br />
+    <button id="CambiarSkin" type="button">
+      Cambiar Skin
+    </button>
+  </div>
+
+  <!-- ========================================
+       CANVAS PRINCIPAL DEL JUEGO
+  ========================================= -->
+  <canvas id="game" class="game-canvas" aria-label="Canvas del juego"></canvas>
+
+  <!-- ========================================
+       MÚSICA DE FONDO
+  ========================================= -->
+  <audio id="bgmusic" autoplay loop src="https://freesound.org/data/previews/539/539777_10224925-lq.mp3"></audio>
+
+  <!-- ========================================
+       BOTONES INFERIORES: VERSIONES / RESET
+  ========================================= -->
+
+  <!--<button id="versions-btn" type="button" aria-haspopup="true" aria-expanded="false" title="Elegir versión">
+    Versiones
+  </button>
+
+
+  <button id="reset-records-btn" type="button" title="Resetear records">
+    Reset
+  </button>
+
+
+  <div id="versions-menu" role="menu" aria-hidden="true"></div>-->
+
+  <!-- JS principal del juego -->
+  <script type="module" src="js/main.js" defer></script>
+</body>
+
+</html>

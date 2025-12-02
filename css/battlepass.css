@@ -1,0 +1,244 @@
+/* ============================================
+   BATTLE PASS MODAL (Matches Inventory Style)
+============================================ */
+
+/* The Modal Container */
+#battlepass-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    width: 90%;
+    max-width: 1200px;
+    min-height: 400px;
+    padding: 38px 48px;
+    background: var(--overlay-strong);
+    border-radius: 28px;
+    box-shadow:
+        var(--shadow-strong),
+        0 0 10px var(--neon-soft-2),
+        0 0 0 4px var(--neon-soft-1) inset;
+    display: none;
+    z-index: 100;
+    color: var(--text-color);
+    animation: fadeIn 0.2s;
+    font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+}
+
+/* Modal Content Wrapper */
+.bp-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Title */
+.bp-content h2 {
+    margin: 0 0 20px 0;
+    font-size: 2.5rem;
+    color: var(--neon-1);
+    text-shadow: 0 0 10px var(--neon-1);
+    text-align: center;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+/* Close Button */
+#close-bp-btn {
+    position: absolute;
+    top: 18px;
+    right: 24px;
+    font-size: 2.2rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--text-color);
+    transition: color 0.2s;
+    line-height: 1;
+}
+
+#close-bp-btn:hover {
+    color: var(--neon-red);
+}
+
+/* Grid Container */
+.bp-grid-container {
+    display: flex;
+    flex: 1;
+    overflow-x: auto;
+    padding: 10px 0 20px 0;
+    gap: 20px;
+    /* Custom Scrollbar styling */
+    scrollbar-width: thin;
+    scrollbar-color: var(--neon-1) var(--surface-dark);
+}
+
+.bp-grid-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.bp-grid-container::-webkit-scrollbar-track {
+    background: var(--surface-dark);
+    border-radius: 4px;
+}
+
+.bp-grid-container::-webkit-scrollbar-thumb {
+    background: var(--neon-1);
+    border-radius: 4px;
+}
+
+/* Row Headers (Free / Premium labels) */
+.bp-row-headers {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    margin-right: 10px;
+    padding-top: 40px;
+    /* Align with cells */
+    min-width: 120px;
+    position: sticky;
+    left: 0;
+    background: var(--overlay-strong);
+    /* Cover scrolling content */
+    z-index: 2;
+}
+
+.bp-header-cell {
+    height: 100px;
+    /* Match cell height + margin */
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 15px;
+    font-size: 1.2rem;
+    color: var(--text-color);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.bp-header-cell.premium {
+    color: #FFD700;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 5px;
+    text-shadow: 0 0 5px #FFD700;
+}
+
+.bp-header-cell .price {
+    font-size: 0.8rem;
+    background: #FFD700;
+    color: #000;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+    text-shadow: none;
+    font-family: sans-serif;
+}
+
+/* Levels Grid */
+.bp-levels-grid {
+    display: flex;
+    gap: 15px;
+}
+
+.bp-level-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 90px;
+}
+
+.bp-level-num {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: var(--neon-soft-2);
+    margin-bottom: 5px;
+}
+
+.bp-level-col.unlocked .bp-level-num {
+    color: var(--neon-1);
+    text-shadow: 0 0 5px var(--neon-1);
+}
+
+/* Reward Cells */
+.bp-cell {
+    width: 90px;
+    height: 90px;
+    background: var(--surface-dark);
+    border: 2px solid transparent;
+    border-radius: 18px;
+    /* Match inventory items */
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.2s ease;
+    box-shadow: 0 0 8px var(--neon-soft-1);
+}
+
+.bp-cell:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px var(--neon-1);
+    border-color: var(--neon-soft-2);
+}
+
+/* Premium Cells */
+.bp-cell.premium {
+    background: rgba(20, 15, 5, 0.6);
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.2);
+}
+
+.bp-cell.premium:hover {
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+    border-color: rgba(255, 215, 0, 0.5);
+}
+
+/* Locked State */
+.bp-cell.locked {
+    opacity: 0.5;
+    filter: grayscale(100%);
+    background: rgba(5, 5, 10, 0.5);
+}
+
+.bp-cell.locked .lock-icon {
+    font-size: 24px;
+    opacity: 0.5;
+}
+
+/* Claimed/Unlocked State */
+.bp-cell.claimed {
+    border-color: var(--neon-green);
+    box-shadow: 0 0 15px rgba(64, 255, 137, 0.3);
+    background: rgba(64, 255, 137, 0.05);
+}
+
+/* Premium Locked Pattern */
+.bp-cell.premium.locked {
+    background: repeating-linear-gradient(45deg,
+            rgba(0, 0, 0, 0.3),
+            rgba(0, 0, 0, 0.3) 10px,
+            rgba(255, 215, 0, 0.05) 10px,
+            rgba(255, 215, 0, 0.05) 20px);
+}
+
+/* Canvas Icon */
+.bp-cell canvas {
+    max-width: 70%;
+    max-height: 70%;
+    filter: drop-shadow(0 0 5px currentColor);
+}
+
+/* Menu Button Style (kept from before) */
+.menu-btn.battlepass {
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    color: #000;
+    text-shadow: none;
+    font-weight: bold;
+    box-shadow: 0 0 15px #FFD700;
+}

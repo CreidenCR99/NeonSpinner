@@ -1,0 +1,614 @@
+/* ============================
+   RESET & VARIABLES
+============================ */
+
+:root {
+    /* Colores base */
+    --bg: #05050a;
+    --text-color: #ffffff;
+
+    /* Neones principales */
+    --neon-1: #00eaff;
+    --neon-2: #00b6c9;
+    --neon-red: #ff4081;
+    --neon-red-dark: #be1e2d;
+    --neon-green: #40ff89;
+
+    /* Variantes alfa de neón (se reutilizan mucho) */
+    --neon-alpha-1: #00eaff99;
+    --neon-soft-1: #00eaff44;
+    --neon-soft-2: #00eaff55;
+    --neon-strong-1: #00eaffcc;
+
+    /* Superficies y overlays reutilizados */
+    --surface-dark: #0a1428;
+    --surface-mid: #222222;
+    --surface-mid-alt: #333333;
+    --overlay-strong: rgba(10, 20, 40, 0.98);
+    --overlay-soft: rgba(10, 20, 40, 0.85);
+
+    /* Sombras típicas reutilizadas */
+    --shadow-strong: 0 0 60px var(--neon-alpha-1);
+    --shadow-soft: 0 0 18px var(--neon-alpha-1);
+}
+
+/* Reset básico */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    overflow: hidden;
+    background: var(--bg);
+    font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+    color: var(--text-color);
+}
+
+/* Utilidades */
+
+.hidden {
+    display: none;
+}
+
+/* ============================
+   CANVAS
+============================ */
+
+.bg-canvas,
+.game-canvas {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: -2;
+}
+
+/* ============================
+   FPS
+============================ */
+
+#FPS {
+    position: absolute;
+    top: 35px;
+    right: 0;
+    margin: 0;
+    padding: 0 14px;
+    font-size: medium;
+    color: var(--neon-soft-1);
+    z-index: 50;
+    transition: 0.1s;
+}
+
+/* ============================
+   PROGRESS BAR
+============================ */
+
+#progress-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 18px;
+    background: var(--overlay-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 30;
+    box-shadow: 0 2px 18px var(--neon-soft-1);
+}
+
+#progress-bar {
+    width: 0%;
+    height: 7px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, var(--neon-1) 60%, var(--neon-2) 100%);
+    box-shadow: 0 0 12px var(--neon-alpha-1);
+    transition:
+        width 0.25s cubic-bezier(0.23, 1.12, 0.32, 1),
+        box-shadow 0.2s;
+}
+
+/* ============================
+   SCORE
+============================ */
+
+#score-record {
+    position: fixed;
+    top: 22px;
+    width: 100vw;
+    display: flex;
+    gap: 32px;
+    justify-content: center;
+    align-items: center;
+    z-index: 31;
+}
+
+#score,
+#record {
+    font-size: 1.3rem;
+    color: var(--neon-1);
+    text-shadow: 0 0 10px var(--neon-1);
+    margin: 0 8px;
+    user-select: none;
+}
+
+/* ============================
+   GAME OVER
+============================ */
+
+#gameover {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3rem;
+    text-align: center;
+    display: none;
+    z-index: 10;
+    user-select: none;
+}
+
+#gameover button {
+    margin: 10px;
+    padding: 12px 24px;
+    font-size: 1.3rem;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#retry {
+    background: var(--neon-1);
+    color: var(--bg);
+}
+
+#backmenu {
+    background: var(--neon-red);
+    color: var(--text-color);
+}
+
+#CambiarSkin {
+    background: var(--neon-green);
+    color: var(--bg);
+}
+
+/* ============================
+   MAIN MENU
+============================ */
+
+#mainmenu {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.95);
+    background: rgba(10, 20, 40, 0.97);
+    padding: 60px 70px 50px;
+    min-width: 340px;
+    border-radius: 30px;
+    text-align: center;
+    z-index: 20;
+    color: var(--text-color);
+    box-shadow:
+        var(--shadow-strong),
+        0 0 10px var(--neon-soft-2),
+        0 0 0 4px var(--neon-soft-1) inset;
+}
+
+#mainmenu h1 {
+    font-size: 3.2rem;
+    margin-bottom: 35px;
+    color: var(--neon-1);
+    letter-spacing: 2px;
+    text-shadow:
+        0 0 25px #00838f,
+        0 0 8px #00838f,
+        0 0 2px #ffffff;
+    animation: neon-glow 2s infinite alternate;
+}
+
+#mainmenu button {
+    margin: 20px 0;
+    padding: 18px 48px;
+    font-size: 1.5rem;
+    border-radius: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    background: linear-gradient(90deg, var(--neon-1) 60%, var(--neon-2) 100%);
+    color: var(--bg);
+    box-shadow:
+        var(--shadow-soft),
+        0 0 4px var(--neon-soft-2);
+    transition:
+        background 0.2s,
+        transform 0.15s,
+        box-shadow 0.2s;
+}
+
+#mainmenu button:enabled:hover {
+    transform: scale(1.07);
+    background: linear-gradient(90deg, var(--neon-2) 60%, var(--neon-1) 100%);
+    box-shadow:
+        0 0 30px var(--neon-strong-1),
+        0 0 8px var(--neon-alpha-1);
+}
+
+#mainmenu button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: #222c;
+    color: #aaa;
+    box-shadow: none;
+}
+
+/* Borde glow del menú */
+
+#mainmenu::before {
+    content: "";
+    position: absolute;
+    inset: -6px;
+    border-radius: 36px;
+    background:
+        linear-gradient(45deg,
+            var(--neon-1) 0%,
+            var(--neon-1) 20%,
+            transparent 20%,
+            transparent 80%,
+            var(--neon-1) 80%,
+            var(--neon-1) 100%),
+        linear-gradient(-45deg,
+            var(--neon-2) 0%,
+            var(--neon-2) 20%,
+            transparent 20%,
+            transparent 80%,
+            var(--neon-2) 80%,
+            var(--neon-2) 100%);
+    filter: blur(10px) brightness(1.3);
+    opacity: 0.7;
+    animation: border-rotate 4s linear infinite;
+    pointer-events: none;
+}
+
+/* Texto de "Nuevo!" arriba a la derecha del boton de modo destruccion en rojo*/
+#new-text {
+    position: absolute;
+    top: 10px;
+    right: -10px;
+    background: var(--neon-red);
+    color: var(--text-color);
+    font-size: 0.7rem;
+    padding: 4px 8px;
+    border-radius: 8px;
+    box-shadow:
+        0 0 8px var(--neon-red),
+        0 0 4px var(--neon-red);
+}
+
+/* contenedor que envuelve botones de modo para posicionar badges relativos */
+.mode-btn-wrap {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    /* mantener alineación con otros botones */
+}
+
+/* ============================
+   INVENTORY MODAL
+============================ */
+
+#inventory-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    min-width: 600px;
+    min-height: 340px;
+    padding: 38px 48px;
+    background: var(--overlay-strong);
+    border-radius: 28px;
+    box-shadow:
+        var(--shadow-strong),
+        0 0 10px var(--neon-soft-2),
+        0 0 0 4px var(--neon-soft-1) inset;
+    display: none;
+    z-index: 100;
+    color: var(--text-color);
+    animation: fadeIn 0.2s;
+}
+
+/* Cuando JS ponga style.display = "block" se fuerza flex */
+#inventory-modal[style*="display: block"] {
+    display: flex !important;
+}
+
+.inventory-layout {
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+    width: 100%;
+    min-width: 600px;
+    min-height: 340px;
+    position: relative;
+}
+
+.inventory-left {
+    flex: 1;
+    min-width: 220px;
+}
+
+.inventory-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
+.inventory-tab {
+    padding: 10px 24px;
+    margin-right: 2px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 8px 8px 0 0;
+    border: none;
+    cursor: pointer;
+    background: var(--surface-dark);
+    color: var(--neon-1);
+    transition: background 0.2s, color 0.2s;
+}
+
+.inventory-tab.active {
+    background: linear-gradient(90deg, var(--neon-1) 60%, var(--neon-2) 100%);
+    color: var(--bg);
+    box-shadow: 0 0 12px var(--neon-alpha-1);
+}
+
+#skins-list {
+    margin-top: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.skin-capsule {
+    font-family: "Press Start 2P", monospace;
+    width: 56px;
+    height: 56px;
+    font-size: 2.1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 18px;
+    background: var(--surface-dark);
+    box-shadow: 0 0 8px var(--neon-soft-1);
+    cursor: pointer;
+    border: 2px solid transparent;
+    user-select: none;
+    transition:
+        border 0.2s,
+        box-shadow 0.2s,
+        background 0.2s;
+}
+
+.skin-capsule.selected {
+    border: 2.5px solid var(--neon-1);
+    background: linear-gradient(90deg, var(--neon-1) 60%, var(--neon-2) 100%);
+    color: var(--bg);
+    box-shadow: var(--shadow-soft);
+}
+
+.inventory-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#big-skin-view {
+    font-family: "Press Start 2P", monospace;
+    font-size: 120px;
+    margin-bottom: 8px;
+    text-shadow:
+        0 0 30px var(--neon-1),
+        0 0 8px var(--neon-alpha-1);
+    transition: color 0.2s, text-shadow 0.2s;
+}
+
+/* Panel de color */
+
+#color-panel {
+    display: block;
+}
+
+.color-help-text {
+    margin-top: 10px;
+    text-align: center;
+}
+
+#close-inventory {
+    position: absolute;
+    top: 18px;
+    right: 24px;
+    font-size: 2.2rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--text-color);
+    transition: color 0.2s;
+}
+
+#close-inventory:hover {
+    color: var(--neon-red);
+}
+
+#color-picker {
+    width: 100%;
+    height: 60px;
+    margin: 8px 0;
+    border-radius: 8px;
+    border: 2px solid var(--neon-1);
+    box-shadow: 0 0 8px var(--neon-alpha-1);
+    cursor: pointer;
+}
+
+/* ============================
+   VERSION BUTTONS (BOTTOM LEFT)
+============================ */
+
+#versions-btn {
+    position: fixed;
+    left: 18px;
+    bottom: 18px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    background: linear-gradient(90deg, var(--neon-1) 60%, var(--neon-2) 100%);
+    color: var(--bg);
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+    z-index: 60;
+    box-shadow:
+        0 0 16px var(--neon-alpha-1),
+        0 0 6px var(--neon-soft-2);
+}
+
+#versions-btn:hover {
+    transform: scale(1.07);
+    background: linear-gradient(90deg, var(--neon-2) 60%, var(--neon-1) 100%);
+    box-shadow:
+        0 0 30px var(--neon-strong-1),
+        0 0 8px var(--neon-alpha-1);
+}
+
+#versions-menu {
+    position: fixed;
+    left: 18px;
+    bottom: 64px;
+    padding: 10px;
+    min-width: 220px;
+    border-radius: 12px;
+    background: var(--overlay-strong);
+    box-shadow:
+        0 8px 30px #0008,
+        0 0 40px var(--neon-alpha-1);
+    font-size: 0.9rem;
+    color: var(--text-color);
+    z-index: 61;
+    display: none;
+}
+
+#versions-menu a {
+    display: block;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    color: var(--neon-1);
+    text-decoration: none;
+    border-radius: 8px;
+}
+
+#versions-menu a:hover {
+    background: rgba(0, 234, 255, 0.08);
+    color: var(--text-color);
+}
+
+/* ============================
+   RESET RECORDS BUTTON
+============================ */
+
+#reset-records-btn {
+    position: fixed;
+    left: 140px;
+    bottom: 18px;
+    padding: 10px 18px;
+    border-radius: 12px;
+    border: none;
+    font-size: 0.95rem;
+    font-weight: bold;
+    user-select: none;
+    cursor: pointer;
+    background: linear-gradient(90deg,
+            var(--neon-red) 60%,
+            var(--neon-red-dark) 100%);
+    color: var(--text-color);
+    box-shadow:
+        0 0 16px #ff408199,
+        0 0 6px #be1e2d55;
+    transition:
+        background 0.2s,
+        transform 0.15s,
+        box-shadow 0.2s;
+    z-index: 61;
+}
+
+#reset-records-btn:hover {
+    transform: scale(1.07);
+    background: linear-gradient(90deg,
+            var(--neon-red-dark) 60%,
+            var(--neon-red) 100%);
+    box-shadow:
+        0 0 30px #ff4081cc,
+        0 0 8px #be1e2d99;
+}
+
+/* ============================
+   ANIMATIONS
+============================ */
+
+@keyframes border-rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes neon-glow {
+
+    0%,
+    25% {
+        text-shadow:
+            0 0 25px #00838f,
+            0 0 8px #00838f,
+            0 0 2px #ffffff;
+    }
+
+    50% {
+        text-shadow:
+            0 0 40px var(--neon-2),
+            0 0 16px var(--neon-2),
+            0 0 8px #ffffff;
+    }
+
+    100% {
+        text-shadow:
+            0 0 40px var(--neon-1),
+            0 0 16px var(--neon-1),
+            0 0 8px #ffffff;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}

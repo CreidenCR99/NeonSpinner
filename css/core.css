@@ -1,0 +1,102 @@
+/* ============================================
+   RESET & DESIGN TOKENS (variables globales)
+============================================ */
+
+:root {
+    /* Colores base del tema */
+    --bg: #05050a;
+    --text-color: #ffffff;
+    --card-bg: rgba(8, 8, 12, 0.95);
+
+    /* Neones principales (cian, acento rojo, verde, naranja) */
+    --neon-1: #00eaff;
+    --neon-2: #00b6c9;
+    --neon-red: #ff4081;
+    --neon-red-dark: #be1e2d;
+    --neon-green: #40ff89;
+    --neon-orange: #ffb347;
+
+    /* Variantes con alfa (para brillos y fondos) */
+    --neon-alpha-1: #00eaff99;
+    --neon-soft-1: #00eaff44;
+    --neon-soft-2: #00eaff55;
+    --neon-strong-1: #00eaffcc;
+
+    /* Superficies y overlays reutilizados */
+    --surface-dark: #0a1428;
+    --surface-mid: #222222;
+    --surface-mid-alt: #333333;
+    --overlay-strong: rgba(10, 20, 40, 0.98);
+    --overlay-soft: rgba(10, 20, 40, 0.85);
+
+    /* Sombras típicas de neón */
+    --shadow-strong: 0 0 60px var(--neon-alpha-1);
+    --shadow-soft: 0 0 18px var(--neon-alpha-1);
+}
+
+/* ============================================
+   RESET BÁSICO / UTILIDADES
+============================================ */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    overflow: hidden;
+    background: var(--bg);
+    font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+    color: var(--text-color);
+}
+
+/* Utilidad simple para ocultar elementos */
+.hidden {
+    display: none;
+}
+
+/* Click feedback para varios botones “importantes” */
+button:active,
+.btn:active,
+.btn-alt:active,
+.btn.small:active,
+#menu-leaderboard-btn:active,
+#playbtn:active,
+#play-destruction:active {
+    transform: scale(0.93);
+    filter: brightness(0.85);
+}
+
+/* Animación de aparición para modales principales */
+.auth-card,
+.leaderboard-panel,
+#inventory-modal {
+    animation: modal-pop 0.25s ease-out;
+}
+
+/* Scrollbar del panel (solo WebKit/Blink) */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0000;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--neon-alpha-1);
+    border-radius: 10px;
+    box-shadow: 0 0 8px var(--neon-alpha-1);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--neon-alpha-1);
+}

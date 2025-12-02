@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Neon Spinner</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Fondo estrellas -->
+    <canvas id="stars" class="bg-canvas" aria-hidden="true"></canvas>
+
+    <!-- FPS -->
+    <h1 id="FPS" aria-live="polite"></h1>
+
+    <!-- Barra de progreso -->
+    <div id="progress-container" aria-hidden="true">
+        <div id="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+        </div>
+    </div>
+
+    <!-- Marcadores -->
+    <div id="score-record" aria-hidden="true">
+        <span id="score" class="hidden">Puntos: 0</span>
+        <span id="record" class="hidden">Récord: 0</span>
+    </div>
+
+    <!-- Menú principal -->
+    <div id="mainmenu" role="dialog" aria-modal="true">
+        <h1>Neon Spinner</h1>
+        <!-- Texto Nuevo! posicionado arriba-derecha -->
+
+        <button id="playbtn" type="button">Jugar</button>
+        <br>
+        <div class="mode-btn-wrap" style="display:inline-block;">
+            <button id="play-destruction" type="button">Modo Destrucción</button>
+            <div id="new-text">Nuevo!</div>
+        </div>
+        <br>
+        <button id="inventorybtn" type="button">Inventario</button>
+    </div>
+
+    <!-- Inventario -->
+    <div id="inventory-modal" role="dialog" aria-modal="true">
+        <div class="inventory-layout">
+            <!-- Columna izquierda: pestañas + lista -->
+            <div class="inventory-left">
+                <div class="inventory-tabs">
+                    <button id="tab-skins" type="button" class="inventory-tab active">
+                        Skins
+                    </button>
+                    <button id="tab-color" type="button" class="inventory-tab">
+                        Color
+                    </button>
+                </div>
+
+                <div id="skins-panel">
+                    <!-- Aquí se mostrarán las skins en cápsulas -->
+                    <div id="skins-list"></div>
+                </div>
+
+                <div id="color-panel">
+                    <label for="color-picker">Color de la skin</label>
+                    <input id="color-picker" type="color" value="#00eaff">
+                    <div class="color-help-text">
+                        Elige el color de tu skin
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna derecha: vista grande -->
+            <div class="inventory-right">
+                <div id="big-skin-view">?</div>
+                <span id="skin-name" class="skin-name"></span>
+            </div>
+
+        </div>
+        <button id="close-inventory" type="button" aria-label="Cerrar inventario">
+            &times;
+        </button>
+    </div>
+
+    <!-- Game over -->
+    <div id="gameover" role="alert" aria-hidden="true">
+        GAME OVER<br />
+        <button id="retry" type="button">Reintentar</button>
+        <button id="backmenu" type="button">Volver al menú</button><br />
+        <button id="CambiarSkin" type="button">Cambiar Skin</button>
+    </div>
+
+    <!-- Canvas del juego -->
+    <canvas id="game" class="game-canvas" aria-label="Canvas del juego">
+    </canvas>
+
+    <!-- Música de fondo (sin autoplay forzado) -->
+    <audio id="bgmusic" autoplay loop src="https://freesound.org/data/previews/539/539777_10224925-lq.mp3">
+    </audio>
+
+    <!-- Botones inferiores: versiones + reset records -->
+    <button id="versions-btn" type="button" aria-haspopup="true" aria-expanded="false" title="Elegir versión">
+        Versiones
+    </button>
+
+    <button id="reset-records-btn" type="button" title="Resetear records">
+        Reset
+    </button>
+
+    <div id="versions-menu" role="menu" aria-hidden="true">
+    </div>
+
+    <script src="script.js" defer></script>
+</body>
+
+</html>
