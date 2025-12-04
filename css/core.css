@@ -16,6 +16,11 @@
     --neon-green: #40ff89;
     --neon-orange: #ffb347;
 
+    /* Neones leaderboard */
+    --neon-top1: #ffe346;
+    --neon-top2: #00fbff;
+    --neon-top3: #ff006a;
+
     /* Variantes con alfa (para brillos y fondos) */
     --neon-alpha-1: #00eaff99;
     --neon-soft-1: #00eaff44;

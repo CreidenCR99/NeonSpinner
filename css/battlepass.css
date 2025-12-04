@@ -207,8 +207,14 @@
 }
 
 .bp-cell.locked .lock-icon {
-    font-size: 24px;
-    opacity: 0.5;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+    opacity: 0.3;
+    z-index: 2;
+    pointer-events: none;
 }
 
 /* Claimed/Unlocked State */
@@ -229,8 +235,8 @@
 
 /* Canvas Icon */
 .bp-cell canvas {
-    max-width: 70%;
-    max-height: 70%;
+    max-width: 90%;
+    max-height: 90%;
     filter: drop-shadow(0 0 5px currentColor);
 }
 

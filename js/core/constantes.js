@@ -1,15 +1,19 @@
 /**
- * Constantes y configuración del juego.
+ * Constantes globales del juego.
  */
+
+/** Resolución fija del canvas del juego. */
+export const GAME_WIDTH = 1488;
+export const GAME_HEIGHT = 755.2;
 
 /**
  * Indica si se está ejecutando en entorno local sin servidor PHP real.
  * @type {boolean}
  */
 export const USE_FAKE_SERVER = false;
-// location.protocol === 'file:' ||
-// location.hostname === '127.0.0.1' ||
-// location.hostname === 'localhost';
+//    location.protocol === 'file:' ||
+//    location.hostname === '127.0.0.1' ||
+//    location.hostname === 'localhost';
 
 export const versionsList = [
     'versions/Neon Spinner v1.0.html',
@@ -22,6 +26,10 @@ export const versionsList = [
     'versions/Neon Spinner v3.1.html',
     'versions/Neon Spinner v4.0/Neon Spinner v4.0.html'
 ];
+
+/** Modo mantenimiento. */
+export const MANTENIMIENTO = false; // o false según necesites
+
 
 /** Duración total del modo destrucción en segundos. */
 export const DESTRUCTION_TOTAL_TIME = 30;
@@ -45,17 +53,17 @@ export const SPAWN_TIME = 300;
  */
 export const SKIN_TYPES = [
     // Letras / Básicos
-    'X', 'Y', 'I', 'π',
+    'X', 'Y', 'I', 'π', '+',
     // Geométricos simples
-    '●', '◎', '△', '◆', '⟁',
+    '●', '◎', '△', '◆', '⟁', '⍟',
     // Cartas y símbolos clásicos
     '♠', '♣', '♥',
     // Estrellas / Brillo / Decorativos
-    '★', '✧', '✦', '✹', '✵',
+    '★', '✧', '✦', '✹', '✵', '𖣘', '⌖',
     // Místicos / Religiosos / Ocultismo
     '✠', '✟', '⛥', 'ψ', 'Ω', '☯', '☬',
     // Peligro / Biohazard
-    '☢', '☣',
+    '☢', '☣', '⌬',
     // Naturaleza / Elementos / Fenómenos
     '☄', '∞',
     // Runas
@@ -68,11 +76,15 @@ export const SKIN_TYPES = [
     '⚽', '🏀', '🥎', '⚾️', '🏐', '🏈',
     // Meméticos / Objetos reconocibles
     '💣', '🧿', '📛', '🍀', '🍄', '🎲',
+    // Skins de comida
+    '🥘','🥚','🫒','🥒',
+    // Skins exclusiva de navidad
+    '🎄',
     // Skins de Rango (Leaderboard)
-    '#', '⚵', '💥',
-    // Nuevos skins
-    '✦', '⌬', '⌖', '⍟', '⚡'
+    '#', '⚵', '💥'
 ];
+
+// Las skins sin asignar a nada son: ⌖, ⍟, +
 
 /** Skins desbloqueadas por defecto. */
 export const DEFAULT_UNLOCKED_SKINS = ['X', '●', '♠', '★', 'ᛉ', '⚙', '67', '⚽', '💣'];
@@ -81,7 +93,9 @@ export const DEFAULT_UNLOCKED_SKINS = ['X', '●', '♠', '★', 'ᛉ', '⚙', '
 export const BIG_SKINS = [
     '𖣘', '67',
     '⚽', '🏀', '🥎', '⚾️', '🏐', '🏈',
-    '🗿', '💣', '🧿', '📛', '🍀', '🍄', '🎲'
+    '🗿', '💣', '🧿', '📛', '🍀', '🍄', '🎲', '💥',
+    '🥘','🥚','🫒','🥒',
+    '🎄'
 ];
 
 /**
@@ -92,18 +106,19 @@ export const BIG_SKINS = [
  */
 export const BATTLE_PASS = {
     FREE: [
-        { level: 1, type: 'Y' }, { level: 3, type: 'I' }, { level: 5, type: 'π' },
-        { level: 7, type: '◎' }, { level: 9, type: '△' }, { level: 11, type: '◆' },
-        { level: 13, type: '⟁' }, { level: 15, type: '♣' }, { level: 17, type: '♥' },
-        { level: 19, type: '✧' }, { level: 21, type: '✦' }, { level: 23, type: '✹' },
-        { level: 25, type: '✵' }
+        { level: 1, type: 'Y' }, { level: 2, type: '🥒'}, { level: 3, type: 'I' },
+        { level: 5, type: 'π' }, { level: 7, type: '♥' }, { level: 9, type: '☣' },
+        { level: 10, type: '◆' }, { level: 11, type: '✠' }, { level: 13, type: '⟁' },
+        { level: 15, type: '♣' }, { level: 17, type: '◎' }, { level: 19, type: '✧' },
+        { level: 21, type: '☯' }, { level: 23, type: '✹' }, { level: 24, type: '✵' },
+        { level: 25, type: '🗿' }
     ],
     PREMIUM: [
-        { level: 1, type: '✠' }, { level: 2, type: '✟' }, { level: 3, type: '⛥' },
-        { level: 4, type: 'ψ' }, { level: 5, type: 'Ω' }, { level: 6, type: '☯' },
-        { level: 7, type: '☬' }, { level: 8, type: '☢' }, { level: 9, type: '☣' },
+        { level: 1, type: '𖣘' }, { level: 2, type: '✟' }, { level: 3, type: '⛥' },
+        { level: 4, type: 'ψ' }, { level: 5, type: 'Ω' }, { level: 6, type: '✦' },
+        { level: 7, type: '☬' }, { level: 8, type: '☢' }, { level: 9, type: '△' },
         { level: 10, type: '☄' }, { level: 11, type: '∞' }, { level: 12, type: 'ᛉ' },
-        { level: 13, type: 'ᛟ' }, { level: 14, type: '⚙' }, { level: 15, type: '🗿' },
+        { level: 13, type: 'ᛟ' }, { level: 14, type: '⚙' }, { level: 15, type: '⌬' },
         { level: 16, type: '🏀' }, { level: 17, type: '🥎' }, { level: 18, type: '⚾️' },
         { level: 19, type: '🏐' }, { level: 20, type: '🏈' }, { level: 21, type: '🧿' },
         { level: 22, type: '📛' }, { level: 23, type: '🍀' }, { level: 24, type: '🍄' },

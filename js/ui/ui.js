@@ -124,9 +124,10 @@ export function enableGameControls(enable) {
  * @param {string} symbol 
  * @param {string} color 
  * @param {number} size 
+ * @param {number} linesize
  * @returns {HTMLCanvasElement}
  */
-export function createIconCanvas(symbol, color, size = 56) {
+export function createIconCanvas(symbol, color, size = 75, linesize = 0) {
     const c = document.createElement('canvas');
     c.width = size;
     c.height = size;
@@ -136,8 +137,8 @@ export function createIconCanvas(symbol, color, size = 56) {
     ic.translate(size / 2, size / 2);
 
     ic.strokeStyle = color;
-    ic.lineWidth = 2;
-    ic.shadowBlur = 20;
+    ic.lineWidth = linesize;
+    ic.shadowBlur = linesize + 1 * 10;
     ic.shadowColor = color;
 
     ic.font = `${Math.floor(size * 0.68)}px 'Press Start 2P', monospace`;
@@ -145,7 +146,7 @@ export function createIconCanvas(symbol, color, size = 56) {
     ic.textBaseline = 'middle';
     ic.strokeText(symbol, 0, 0);
 
-    ic.globalAlpha = 0.15;
+    ic.globalAlpha = 0.25;
     ic.fillStyle = color;
     ic.fillText(symbol, 0, 0);
     ic.globalAlpha = 1;
@@ -162,7 +163,17 @@ export function renderSkinsList(onSelect) {
     if (!ui.skinsList) return;
     ui.skinsList.innerHTML = '';
 
-    state.playerSkins.forEach((skin) => {
+    const ITEMS_PER_PAGE = 30;
+    const totalPages = Math.ceil(state.playerSkins.length / ITEMS_PER_PAGE);
+
+    // Validar página actual
+    if (state.inventoryPage >= totalPages) state.inventoryPage = Math.max(0, totalPages - 1);
+
+    const start = state.inventoryPage * ITEMS_PER_PAGE;
+    const end = start + ITEMS_PER_PAGE;
+    const skinsToShow = state.playerSkins.slice(start, end);
+
+    skinsToShow.forEach((skin) => {
         const item = document.createElement('div');
         item.className = 'skin-item';
 
@@ -181,6 +192,58 @@ export function renderSkinsList(onSelect) {
 
         ui.skinsList.appendChild(item);
     });
+
+    renderPagination(totalPages, onSelect);
+}
+
+/**
+ * Renderiza los controles de paginación.
+ * @param {number} totalPages 
+ * @param {Function} onSelect 
+ */
+function renderPagination(totalPages, onSelect) {
+    let paginationContainer = document.getElementById('inventory-pagination');
+    if (!paginationContainer) {
+        paginationContainer = document.createElement('div');
+        paginationContainer.id = 'inventory-pagination';
+        paginationContainer.className = 'inventory-pagination';
+        // Insertar después de la lista de skins
+        ui.skinsPanel.appendChild(paginationContainer);
+    }
+
+    paginationContainer.innerHTML = '';
+
+    if (totalPages <= 1) return;
+
+    const prevBtn = document.createElement('button');
+    prevBtn.textContent = '<';
+    prevBtn.className = 'pagination-btn';
+    prevBtn.disabled = state.inventoryPage === 0;
+    prevBtn.onclick = () => {
+        if (state.inventoryPage > 0) {
+            state.inventoryPage--;
+            updateInventoryView(onSelect);
+        }
+    };
+
+    const pageInfo = document.createElement('span');
+    pageInfo.className = 'pagination-info';
+    pageInfo.textContent = `${state.inventoryPage + 1} / ${totalPages}`;
+
+    const nextBtn = document.createElement('button');
+    nextBtn.textContent = '>';
+    nextBtn.className = 'pagination-btn';
+    nextBtn.disabled = state.inventoryPage >= totalPages - 1;
+    nextBtn.onclick = () => {
+        if (state.inventoryPage < totalPages - 1) {
+            state.inventoryPage++;
+            updateInventoryView(onSelect);
+        }
+    };
+
+    paginationContainer.appendChild(prevBtn);
+    paginationContainer.appendChild(pageInfo);
+    paginationContainer.appendChild(nextBtn);
 }
 
 /**
@@ -196,7 +259,8 @@ export function updateInventoryView(onSave) {
     const bigCanvas = createIconCanvas(
         state.currentSkin.type,
         state.currentSkin.color,
-        250
+        250,
+        2
     );
     ui.bigSkinView.appendChild(bigCanvas);
 
@@ -328,9 +392,9 @@ export function updateXPBar() {
  */
 function getMedalStyle(index) {
     switch (index) {
-        case 0: return 'color: #FFD700; text-shadow: 0 0 5px #FFD700; font-weight: bold;';
-        case 1: return 'color: #C0C0C0; text-shadow: 0 0 5px #C0C0C0; font-weight: bold;';
-        case 2: return 'color: #CD7F32; text-shadow: 0 0 5px #CD7F32; font-weight: bold;';
+        case 0: return 'color: var(--neon-top1); text-shadow: 0 0 10px #ffe346; font-weight: 500; font-size: 1.25rem;';
+        case 1: return 'color: var(--neon-top2); text-shadow: 0 0 10px #00fbff; font-weight: 500; font-size: 1.15rem;';
+        case 2: return 'color: var(--neon-top3); text-shadow: 0 0 10px #ff006a; font-weight: 500; font-size: 1.05rem;';
         default: return '';
     }
 }

@@ -46,26 +46,28 @@
 
 @keyframes neon-glow {
 
-    0%,
-    25% {
+    0% {
+        color: var(--neon-1);
         text-shadow:
             0 0 25px #00838f,
             0 0 8px #00838f,
             0 0 2px #ffffff;
     }
 
-    50% {
+    75% {
+        color: #66faff;
         text-shadow:
-            0 0 40px var(--neon-2),
-            0 0 16px var(--neon-2),
+            0 0 50px var(--neon-2),
+            0 0 20px var(--neon-2),
             0 0 8px #ffffff;
     }
 
     100% {
+        color: #adfcff;
         text-shadow:
+            0 0 80px var(--neon-1),
             0 0 40px var(--neon-1),
-            0 0 16px var(--neon-1),
-            0 0 8px #ffffff;
+            0 0 10px #ffffff;
     }
 }
 

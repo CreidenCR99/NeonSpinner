@@ -18,63 +18,70 @@ if (USE_FAKE_SERVER && !localStorage.getItem('FAKE_DB')) {
                 pass: btoa('1234'),
                 recordHuida: 45,
                 recordDestruccion: 28,
-                unlocked_skins: 'X,●,♠,★,ᛉ,⚙,67,⚽,💣,Y,◎,△,✧,☢,☄',
+                unlocked_skins: 'X,●,♠,★,ᛉ,⚙,67,⚽,💣',
                 equipped_skin: JSON.stringify({ type: '★', color: 'hsl(60,100%,50%)' }),
                 total_play_time: 360,
+                has_premium: false,
                 xp: 0
             },
             luis: {
                 pass: btoa('1111'),
                 recordHuida: 12,
                 recordDestruccion: 52,
-                unlocked_skins: 'X,●,♠,★,ᛉ,⚙,67,⚽,💣,I,♣,♥,✦,☣,ψ',
+                unlocked_skins: 'X,●,♠,★,ᛉ,⚙,67,⚽,💣',
                 equipped_skin: JSON.stringify({ type: '💣', color: 'hsl(0,100%,60%)' }),
                 total_play_time: 540,
-                xp: 120
+                has_premium: true,
+                xp: 15000
             },
             mario: {
                 pass: btoa('0000'),
                 recordHuida: 67,
                 recordDestruccion: 15,
-                unlocked_skins: 'X,●,♠,★,ᛉ,⚙,67,⚽,💣,π,◆,✹,✠,Ω,🏀',
+                unlocked_skins: 'X,●,♠,★,ᛉ,⚙,67,⚽,💣',
                 equipped_skin: JSON.stringify({ type: '⚽', color: 'hsl(120,80%,50%)' }),
                 total_play_time: 720,
-                xp: 300
+                has_premium: true,
+                xp: 500
             },
             laura: {
                 pass: btoa('abcd'),
                 recordHuida: 34,
                 recordDestruccion: 41,
-                unlocked_skins: 'X,●,♠,★,ᛉ,⚙,67,⚽,💣,Y,⟁,✵,☯,∞,🍀',
+                unlocked_skins: 'X,●,♠,★,ᛉ,⚙,67,⚽,💣',
                 equipped_skin: JSON.stringify({ type: '●', color: 'hsl(280,90%,60%)' }),
                 total_play_time: 420,
+                has_premium: false,
                 xp: 600
             },
             carlos: {
                 pass: btoa('pass'),
                 recordHuida: 58,
                 recordDestruccion: 8,
-                unlocked_skins: 'X,●,♠,★,ᛉ,⚙,67,⚽,💣,I,△,✧,✟,ᛟ,🎲',
+                unlocked_skins: 'X,●,♠,★,ᛉ,⚙,67,⚽,💣',
                 equipped_skin: JSON.stringify({ type: 'ᛉ', color: 'hsl(200,70%,50%)' }),
                 total_play_time: 600,
+                has_premium: false,
                 xp: 40
             },
             sofia: {
                 pass: btoa('qwerty'),
                 recordHuida: 23,
                 recordDestruccion: 38,
-                unlocked_skins: 'X,●,♠,★,ᛉ,⚙,67,⚽,💣,π,♣,✦,⛥,☬,🧿',
+                unlocked_skins: 'X,●,♠,★,ᛉ,⚙,67,⚽,💣',
                 equipped_skin: JSON.stringify({ type: '♠', color: 'hsl(320,85%,55%)' }),
                 total_play_time: 280,
+                has_premium: false,
                 xp: 100
             },
             david: {
                 pass: btoa('zxcv'),
                 recordHuida: 41,
                 recordDestruccion: 31,
-                unlocked_skins: 'X,●,♠,★,ᛉ,⚙,67,⚽,💣,Y,◎,✹,☢,ψ,🏐',
+                unlocked_skins: 'X,●,♠,★,ᛉ,⚙,67,⚽,💣',
                 equipped_skin: JSON.stringify({ type: '67', color: 'hsl(40,95%,50%)' }),
                 total_play_time: 480,
+                has_premium: false,
                 xp: 200
             },
             juan: {
@@ -84,7 +91,18 @@ if (USE_FAKE_SERVER && !localStorage.getItem('FAKE_DB')) {
                 unlocked_skins: 'X,●,♠,★,ᛉ,⚙,67,⚽,💣',
                 equipped_skin: JSON.stringify({ type: 'X', color: 'hsl(0,100%,50%)' }),
                 total_play_time: 600,
+                has_premium: false,
                 xp: 300
+            },
+            val: {
+                pass: btoa('123'),
+                recordHuida: 100,
+                recordDestruccion: 100,
+                unlocked_skins: 'X,●,♠,★,ᛉ,⚙,67,⚽,💣',
+                equipped_skin: JSON.stringify({ type: '67', color: 'hsl(40,95%,50%)' }),
+                total_play_time: 1500,
+                has_premium: true,
+                xp: 15000
             }
         },
         session: null

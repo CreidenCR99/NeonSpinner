@@ -93,11 +93,11 @@ function createRewardCell(reward, level, currentLevel, isPremium) {
     } else {
         cell.classList.add('claimed'); // Visualmente "reclamado" o disponible
     }
-
+    
     // Renderizar skin
     // Usamos un color aleatorio neón para que se vea vibrante
     const color = generarColorHslAleatorio();
-    const canvas = createIconCanvas(reward.type, color, 50); // Aumentado tamaño ligeramente
+    const canvas = createIconCanvas(reward.type, color, 75, 1); // Aumentado tamaño ligeramente
     cell.appendChild(canvas);
 
     // Tooltip simple

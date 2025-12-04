@@ -107,6 +107,9 @@ export const state = {
     /** @type {'skins'|'color'} Pestaña de inventario. */
     currentInventoryTab: 'skins',
 
+    /** @type {number} Página actual del inventario. */
+    inventoryPage: 0,
+
     /** @type {boolean} Modo desarrollador. */
     devMode: false,
 
@@ -117,5 +120,15 @@ export const state = {
     rafId: null,
 
     /** @type {number|null} Timer genérico de modo. */
-    modeTimerId: null
+    modeTimerId: null,
+
+    // Factores de escala para traducir coordenadas del mouse
+    /** @type {number} Factor de escala CSS en X. */
+    scaleX: 1,
+    /** @type {number} Factor de escala CSS en Y. */
+    scaleY: 1,
+    /** @type {number} Offset horizontal del canvas centrado. */
+    offsetX: 0,
+    /** @type {number} Offset vertical del canvas centrado. */
+    offsetY: 0
 };

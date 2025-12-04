@@ -6,7 +6,8 @@
 import { state } from './core/estado.js';
 import {
     INITIAL_SPEED, SPAWN_TIME, DESTRUCTION_TOTAL_TIME,
-    DEFAULT_UNLOCKED_SKINS, SKIN_TYPES
+    DEFAULT_UNLOCKED_SKINS, SKIN_TYPES, MANTENIMIENTO,
+    GAME_WIDTH, GAME_HEIGHT
 } from './core/constantes.js';
 import {
     ui, showOverlayLogin, setAuthMiniText, enableGameControls,
@@ -38,7 +39,7 @@ import {
    ============================ */
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('Neon Spinner v7');
+    console.log('Neon Spinner v7.5');
 
     // Inicializar canvas
     const canvas = document.getElementById('game');
@@ -72,13 +73,40 @@ document.addEventListener('DOMContentLoaded', () => {
        ============================ */
 
     function resize() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        starsCanvas.width = canvas.width;
-        starsCanvas.height = canvas.height;
+        // Fijar resolución del canvas a 1920x1080
+        canvas.width = GAME_WIDTH;
+        canvas.height = GAME_HEIGHT;
+        starsCanvas.width = GAME_WIDTH;
+        starsCanvas.height = GAME_HEIGHT;
+        state.width = GAME_WIDTH;
+        state.height = GAME_HEIGHT;
+        // Calcular escala para ajustar al viewport manteniendo aspect ratio
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        const scaleX = viewportWidth / GAME_WIDTH;
+        const scaleY = viewportHeight / GAME_HEIGHT;
+        const scale = Math.min(scaleX, scaleY);
+        // Aplicar escala CSS
+        const scaledWidth = GAME_WIDTH * scale;
+        const scaledHeight = GAME_HEIGHT * scale;
 
-        state.width = canvas.width;
-        state.height = canvas.height;
+        canvas.style.width = scaledWidth + 'px';
+        canvas.style.height = scaledHeight + 'px';
+        starsCanvas.style.width = scaledWidth + 'px';
+        starsCanvas.style.height = scaledHeight + 'px';
+        // Centrar canvas
+        const offsetX = (viewportWidth - scaledWidth) / 2;
+        const offsetY = (viewportHeight - scaledHeight) / 2;
+
+        canvas.style.left = offsetX + 'px';
+        canvas.style.top = offsetY + 'px';
+        starsCanvas.style.left = offsetX + 'px';
+        starsCanvas.style.top = offsetY + 'px';
+        // Guardar factores de escala para traducir coordenadas del mouse
+        state.scaleX = scale;
+        state.scaleY = scale;
+        state.offsetX = offsetX;
+        state.offsetY = offsetY;
     }
 
     function iniciarPartida() {
@@ -271,6 +299,21 @@ document.addEventListener('DOMContentLoaded', () => {
     /* ============================
        SESIÓN Y UI
        ============================ */
+
+    /**
+     * Muestra u oculta el overlay de mantenimiento según el estado de la constante MANTENIMIENTO.
+     * Si MANTENIMIENTO es true, se muestra el overlay; si es false, se oculta.
+     */
+    function activarMantenimiento() {
+        const overlay = document.getElementById("maintenance-overlay");
+
+        if (MANTENIMIENTO) {
+            overlay.style.display = "flex";
+        } else {
+            overlay.style.display = "none";
+        }
+    }
+    activarMantenimiento();
 
     async function loadSession() {
         const r = await api('get_user.php', 'GET');
@@ -478,8 +521,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // Input Juego
         document.addEventListener('mousemove', (e) => {
             if (state.playing) {
-                state.player.x = e.clientX;
-                state.player.y = e.clientY;
+                // Traducir coordenadas del viewport a coordenadas del canvas
+                const rect = canvas.getBoundingClientRect();
+                state.player.x = (e.clientX - rect.left) * (GAME_WIDTH / rect.width);
+                state.player.y = (e.clientY - rect.top) * (GAME_HEIGHT / rect.height);
             }
         });
 
