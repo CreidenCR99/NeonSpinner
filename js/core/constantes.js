@@ -3,8 +3,8 @@
  */
 
 /** Resolución fija del canvas del juego. */
-export const GAME_WIDTH = 1488;
-export const GAME_HEIGHT = 755.2;
+export const GAME_WIDTH = 1912;
+export const GAME_HEIGHT = 954;
 
 /**
  * Indica si se está ejecutando en entorno local sin servidor PHP real.
@@ -53,49 +53,63 @@ export const SPAWN_TIME = 300;
  */
 export const SKIN_TYPES = [
     // Letras / Básicos
-    'X', 'Y', 'I', 'π', '+',
+    'X', 'Y', 'I', '+',
+    // Números / Especiales
+    '67', '69', 'π', '∞', 
     // Geométricos simples
-    '●', '◎', '△', '◆', '⟁', '⍟',
+    '●', '◎', '△', '⟁',
     // Cartas y símbolos clásicos
-    '♠', '♣', '♥',
+    '◆', '♠', '♣', '♥',
     // Estrellas / Brillo / Decorativos
-    '★', '✧', '✦', '✹', '✵', '𖣘', '⌖',
+    '★', '✧', '✦', '✹', '✵', '𖣘', '⍟', '⌖',
     // Místicos / Religiosos / Ocultismo
-    '✠', '✟', '⛥', 'ψ', 'Ω', '☯', '☬',
+    '⛥', '✟', '✠', 'ψ', 'Ω', '☯', '☬', '🧿',
     // Peligro / Biohazard
     '☢', '☣', '⌬',
     // Naturaleza / Elementos / Fenómenos
-    '☄', '∞',
+    '☄', '🌚', '🌞',
     // Runas
     'ᛉ', 'ᛟ',
     // Objetos / Ítems
     '⚙', '🗿',
-    // Números / Especiales
-    '67',
+    // Objetos reconocibles
+    '💣', '📛', '🍀', '🎲', '💋',
     // Deportivos
     '⚽', '🏀', '🥎', '⚾️', '🏐', '🏈',
-    // Meméticos / Objetos reconocibles
-    '💣', '🧿', '📛', '🍀', '🍄', '🎲',
-    // Skins de comida
-    '🥘','🥚','🫒','🥒',
-    // Skins exclusiva de navidad
-    '🎄',
-    // Skins de Rango (Leaderboard)
+    // Comida
+    '🍄', '🥘', '🥚', '🫒', '🥒',
+    // Animales
+    '🦊',
+    // Navidad
+    '🎄', '❄️', '🎁',
+    // Halloween
+    '🎃', '💀', '🕸️', '🕷️',
+    // Leaderboard
     '#', '⚵', '💥'
 ];
 
-// Las skins sin asignar a nada son: ⌖, ⍟, +
+/* Las skins sin asignar a nada son: +, 69, ⍟, ⌖, 🥎, 🥘, 🫒, 🦊, 🌚, 🌞
+*  Las skins exclusivas son:    🎄, ❄️, 🎁
+*                               🎃, 💀, 🕸️, 🕷️
+*/
+
 
 /** Skins desbloqueadas por defecto. */
 export const DEFAULT_UNLOCKED_SKINS = ['X', '●', '♠', '★', 'ᛉ', '⚙', '67', '⚽', '💣'];
 
 /** Skins que se renderizan más grandes. */
 export const BIG_SKINS = [
-    '𖣘', '67',
+    '67', '69',
+    '𖣘',
+    '🧿',
+    '🌚', '🌞',
+    '🗿', '💣', '📛', '🍀', '🎲', '💋',
     '⚽', '🏀', '🥎', '⚾️', '🏐', '🏈',
-    '🗿', '💣', '🧿', '📛', '🍀', '🍄', '🎲', '💥',
-    '🥘','🥚','🫒','🥒',
-    '🎄'
+    '🍄', '🥘', '🥚', '🫒', '🥒',
+    '🦊',
+    '🎄', '❄️', '🎁',
+    '🎃', '💀', '🕸️', '🕷️',
+    '💥',
 ];
 
 /**
@@ -119,7 +133,7 @@ export const BATTLE_PASS = {
         { level: 7, type: '☬' }, { level: 8, type: '☢' }, { level: 9, type: '△' },
         { level: 10, type: '☄' }, { level: 11, type: '∞' }, { level: 12, type: 'ᛉ' },
         { level: 13, type: 'ᛟ' }, { level: 14, type: '⚙' }, { level: 15, type: '⌬' },
-        { level: 16, type: '🏀' }, { level: 17, type: '🥎' }, { level: 18, type: '⚾️' },
+        { level: 16, type: '🏀' }, { level: 17, type: '🥚' }, { level: 18, type: '⚾️' },
         { level: 19, type: '🏐' }, { level: 20, type: '🏈' }, { level: 21, type: '🧿' },
         { level: 22, type: '📛' }, { level: 23, type: '🍀' }, { level: 24, type: '🍄' },
         { level: 25, type: '🎲' }

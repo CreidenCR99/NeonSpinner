@@ -103,6 +103,36 @@ if (USE_FAKE_SERVER && !localStorage.getItem('FAKE_DB')) {
                 total_play_time: 1500,
                 has_premium: true,
                 xp: 15000
+            },
+            elena: {
+                pass: btoa('elena123'),
+                recordHuida: 29,
+                recordDestruccion: 22,
+                unlocked_skins: 'X,●,♠,★,ᛉ,⚙,67,⚽,💣',
+                equipped_skin: JSON.stringify({ type: '⚙', color: 'hsl(180,100%,40%)' }),
+                total_play_time: 350,
+                has_premium: false,
+                xp: 250
+            },
+            pablo: {
+                pass: btoa('pablo321'),
+                recordHuida: 60,
+                recordDestruccion: 45,
+                unlocked_skins: 'X,●,♠,★,ᛉ,⚙,67,⚽,💣',
+                equipped_skin: JSON.stringify({ type: '★', color: 'hsl(300,80%,60%)' }),
+                total_play_time: 800,
+                has_premium: true,
+                xp: 5000
+            },
+            fran: {
+                pass: btoa('fran'),
+                recordHuida: 2,
+                recordDestruccion: 6,
+                unlocked_skins: 'X,●,♠,★,ᛉ,⚙,67,⚽,💣',
+                equipped_skin: JSON.stringify({ type: '♠', color: 'hsl(90,90%,50%)' }),
+                total_play_time: 270,
+                has_premium: false,
+                xp: 120
             }
         },
         session: null

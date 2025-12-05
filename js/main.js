@@ -39,7 +39,7 @@ import {
    ============================ */
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('Neon Spinner v7.5');
+    console.log('Neon Spinner v7.6');
 
     // Inicializar canvas
     const canvas = document.getElementById('game');
@@ -443,9 +443,11 @@ document.addEventListener('DOMContentLoaded', () => {
             ui.authMsg.textContent = 'Registrando...';
             const r = await api('register.php', 'POST', { username: u, password: p });
             if (r.ok && r.data.ok) {
-                ui.authMsg.textContent = 'Registrado. Inicia sesión.';
+            ui.authMsg.textContent = 'Registrado. Inicia sesión.';
+            } else if (r.data && r.data.exists) {
+            ui.authMsg.textContent = 'El usuario ya existe.';
             } else {
-                ui.authMsg.textContent = 'Error registro.';
+            ui.authMsg.textContent = 'Error registro.';
             }
         });
 
@@ -529,8 +531,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') location.reload();
+            if (state.playing && e.key === 'Escape') location.reload();
+            if (!state.playing && e.key === 'Escape') closeAllMenus();
 
+            if (ui.authOverlay && e.key === 'Enter') {
+                if (ui.authOverlay.style.display === 'flex' || ui.authOverlay.style.display === '') {
+                    ui.authLogin.click();
+                }
+            }
             // Dev Mode
             if (e.key === 'Tab') {
                 const onNext = (ev) => {

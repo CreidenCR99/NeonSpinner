@@ -392,9 +392,9 @@ export function updateXPBar() {
  */
 function getMedalStyle(index) {
     switch (index) {
-        case 0: return 'color: var(--neon-top1); text-shadow: 0 0 10px #ffe346; font-weight: 500; font-size: 1.25rem;';
-        case 1: return 'color: var(--neon-top2); text-shadow: 0 0 10px #00fbff; font-weight: 500; font-size: 1.15rem;';
-        case 2: return 'color: var(--neon-top3); text-shadow: 0 0 10px #ff006a; font-weight: 500; font-size: 1.05rem;';
+        case 0: return 'color: var(--neon-top1); text-shadow: 0 0 10px #ffe346; font-weight: 500; font-size: 1.45rem;';
+        case 1: return 'color: var(--neon-top2); text-shadow: 0 0 10px #00fbff; font-weight: 500; font-size: 1.35rem;';
+        case 2: return 'color: var(--neon-top3); text-shadow: 0 0 10px #ff006a; font-weight: 500; font-size: 1.25rem;';
         default: return '';
     }
 }
@@ -448,6 +448,53 @@ export async function loadLeaderboardTables() {
         });
     };
 
+    // Render top 10
     if (ui.lbHuidaBody) renderRows(huidaPlayers, ui.lbHuidaBody, 'recordHuida');
     if (ui.lbDestruBody) renderRows(destruPlayers, ui.lbDestruBody, 'recordDestruccion');
+
+    // Mostrar el propio jugador abajo si no está en el top 10
+    const showCurrentUserRow = (playersList, topList, container, scoreKey) => {
+        if (!state.sessionUser) return;
+        const userIndex = playersList.findIndex(p => p.username === state.sessionUser);
+        if (userIndex === -1) return;
+        // ¿Ya está en el top 10?
+        const inTop = topList.some(p => p.username === state.sessionUser);
+        if (inTop) return;
+
+        const player = playersList[userIndex];
+        const tr = document.createElement('tr');
+        tr.className = 'your-row';
+
+        const tdPos = document.createElement('td');
+        tdPos.textContent = String(userIndex + 1);
+        tdPos.style.cssText = 'background: #ffff0022; font-size: 1.2rem;';
+
+        const tdUser = document.createElement('td');
+        tdUser.textContent = player.username;
+        tdUser.style.cssText = 'background: #ffff0022; font-size: 1.2rem;';
+
+        const tdScore = document.createElement('td');
+        tdScore.textContent = String(player[scoreKey]);
+        tdScore.style.cssText = 'background: #ffff0022; font-size: 1.2rem;';
+
+        tr.appendChild(tdPos);
+        tr.appendChild(tdUser);
+        tr.appendChild(tdScore);
+        container.appendChild(tr);
+    };
+
+    // Para huida
+    if (ui.lbHuidaBody) {
+        const huidaSorted = players
+            .filter(p => Number(p.recordHuida) > 0)
+            .sort((a, b) => Number(b.recordHuida) - Number(a.recordHuida));
+        showCurrentUserRow(huidaSorted, huidaPlayers, ui.lbHuidaBody, 'recordHuida');
+    }
+    // Para destrucción
+    if (ui.lbDestruBody) {
+        const destruSorted = players
+            .filter(p => Number(p.recordDestruccion) > 0)
+            .sort((a, b) => Number(b.recordDestruccion) - Number(a.recordDestruccion));
+        showCurrentUserRow(destruSorted, destruPlayers, ui.lbDestruBody, 'recordDestruccion');
+    }
 }

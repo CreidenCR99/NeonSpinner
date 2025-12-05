@@ -41,7 +41,7 @@ export function spawnProjectile(canvasWidth, canvasHeight) {
     }
 
     const baseRadius = state.gameMode === 'destruccion' ? 18 : 14; // Más grandes en destrucción
-    const speedMultiplier = state.gameMode === 'destruccion' ? 0.85 : 1; // 25% más lentas en destrucción
+    const speedMultiplier = state.gameMode === 'destruccion' ? 0.85 : 1; // 15% más lentas en destrucción
 
     state.projectiles.push({
         x,

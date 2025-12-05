@@ -29,10 +29,25 @@ export function renderBattlePass() {
     // Cabeceras de filas
     const rowHeaders = document.createElement('div');
     rowHeaders.className = 'bp-row-headers';
-    rowHeaders.innerHTML = `
-        <div class="bp-header-cell">Free</div>
-        <div class="bp-header-cell premium">Premium<br><span style="cursor: pointer;" class="price">Comprar<br>(4.99€)</span></div>
-    `;
+    if (!state.hasPremium) {
+        rowHeaders.innerHTML = `
+            <div class="bp-header-cell">Free</div>
+            <div class="bp-header-cell premium">
+                Premium<br>
+                <span class="price">
+                    Comprar<br>
+                    <span class="old-price">7,99€</span><br>
+                    <span class="current-price">1,99€</span>
+                </span>
+            </div>
+        `;
+    } else {
+        rowHeaders.innerHTML = `
+            <div class="bp-header-cell">Free</div>
+            <div class="bp-header-cell premium">Premium</div>
+        `;
+    }
+
     container.appendChild(rowHeaders);
 
     // Grid de niveles (1-25)
@@ -93,7 +108,7 @@ function createRewardCell(reward, level, currentLevel, isPremium) {
     } else {
         cell.classList.add('claimed'); // Visualmente "reclamado" o disponible
     }
-    
+
     // Renderizar skin
     // Usamos un color aleatorio neón para que se vea vibrante
     const color = generarColorHslAleatorio();
@@ -101,7 +116,7 @@ function createRewardCell(reward, level, currentLevel, isPremium) {
     cell.appendChild(canvas);
 
     // Tooltip simple
-    cell.title = `Nivel ${level}: ${reward.type}`;
+    cell.title = `Nivel ${level}: ${reward.type} `;
 
     return cell;
 }
@@ -122,7 +137,7 @@ export async function checkAndClaimRewards() {
             // Intentar desbloquear (la API verifica si ya la tiene)
             const r = await api('unlock_skin.php', 'POST', { skin_type: reward.type });
             if (r.ok && r.data.unlocked) {
-                console.log(`🎁 Recompensa Nivel ${reward.level} reclamada: ${reward.type}`);
+                console.log(`🎁 Recompensa Nivel ${reward.level} reclamada: ${reward.type} `);
                 newUnlocks = true;
             }
         }
@@ -134,7 +149,7 @@ export async function checkAndClaimRewards() {
             if (reward.level <= currentLevel) {
                 const r = await api('unlock_skin.php', 'POST', { skin_type: reward.type });
                 if (r.ok && r.data.unlocked) {
-                    console.log(`🎁 Recompensa Premium Nivel ${reward.level} reclamada: ${reward.type}`);
+                    console.log(`🎁 Recompensa Premium Nivel ${reward.level} reclamada: ${reward.type} `);
                     newUnlocks = true;
                 }
             }
