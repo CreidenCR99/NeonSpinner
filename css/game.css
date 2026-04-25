@@ -1,0 +1,18 @@
+/* ============================================
+   CANVAS (fondo y juego)
+============================================ */
+
+.bg-canvas,
+.game-canvas {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: -2;
+}
+
+/* Animación de "jolt" para el contador de puntos */
+.score-bump {
+    animation: score-bump-anim 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}

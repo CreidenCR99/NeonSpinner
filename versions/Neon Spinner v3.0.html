@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html id="html" lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Neon Spinner</title>
+<style>
+body{margin:0;overflow:hidden;background:#05050a;font-family:Impact,Haettenschweiler,'Arial Narrow Bold',sans-serif;}
+#stars,#game{position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:-2;}
+#FPS{color:#00eaff44;font-size:medium;position:absolute;right:0;top:35px;z-index:50;transition:0.1s;}
+#progress-container{position:fixed;top:0;left:0;width:100vw;height:18px;background:rgba(10,20,40,0.85);z-index:30;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 18px #00eaff44;}
+#progress-bar{height:7px;border-radius:8px;background:linear-gradient(90deg,#00eaff 60%,#00b6c9 100%);box-shadow:0 0 12px #00eaff99;width:0%;transition:width 0.25s cubic-bezier(.23,1.12,.32,1),box-shadow 0.2s;}
+#score-record{position:fixed;top:22px;width:100vw;display:flex;gap:32px;align-items:center;justify-content:center;z-index:31;}
+#score,#record{font-size:1.3rem;color:#00eaff;text-shadow:0 0 10px #00eaff;margin:0 8px;}
+#gameover{position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);color:white;text-align:center;font-size:3rem;display:none;z-index:10;user-select:none;}
+#gameover button{margin:10px;padding:12px 24px;font-size:1.3rem;border:none;border-radius:10px;cursor:pointer;font-weight:bold;}
+#retry{background:#00eaff;color:white;}
+#backmenu{background:#ff4081;color:white;}
+#CambiarSkin{background:#40ff89;color:white;}
+#mainmenu{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.95);background:rgba(10,20,40,0.97);border-radius:30px;padding:60px 70px 50px 70px;text-align:center;z-index:20;min-width:340px;box-shadow:0 0 60px #00eaff99,0 0 10px #00eaff55,0 0 0 4px #00eaff22 inset;color:#fff;}
+#mainmenu h1{font-size:3.2rem;color:#00eaff;margin-bottom:35px;text-shadow:0 0 25px #00838f,0 0 8px #00838f,0 0 2px #fff;letter-spacing:2px;animation:neon-glow 2s infinite alternate;}
+#mainmenu button{margin:20px 0;padding:18px 48px;font-size:1.5rem;border:none;border-radius:14px;cursor:pointer;background:linear-gradient(90deg,#00eaff 60%,#00b6c9 100%);color:#05050a;font-weight:bold;box-shadow:0 0 18px #00eaff99,0 0 4px #00eaff55;transition:background 0.2s,transform 0.15s,box-shadow 0.2s;outline:none;position:relative;overflow:hidden;}
+#mainmenu button:enabled:hover{background:linear-gradient(90deg,#00b6c9 60%,#00eaff 100%);transform:scale(1.07);box-shadow:0 0 30px #00eaffcc,0 0 8px #00eaff99;}
+#mainmenu button:disabled{opacity:0.6;cursor:not-allowed;background:#222c;color:#aaa;box-shadow:none;}
+#mainmenu::before{content:"";position:absolute;inset:-6px;border-radius:36px;z-index:-1;pointer-events:none;background:linear-gradient(45deg,#00eaff 0%,#00eaff 20%,transparent 20%,transparent 80%,#00eaff 80%,#00eaff 100%),linear-gradient(-45deg,#00b6c9 0%,#00b6c9 20%,transparent 20%,transparent 80%,#00b6c9 80%,#00b6c9 100%);filter:blur(10px) brightness(1.3);opacity:0.7;animation:border-rotate 4s linear infinite;}
+@keyframes border-rotate{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+@keyframes neon-glow{0%,25%{text-shadow:0 0 25px #00838f,0 0 8px #00838f,0 0 2px #fff;}100%{text-shadow:0 0 40px #00eaff,0 0 16px #00eaff,0 0 8px #fff;}}
+</style>
+</head>
+<body>
+<canvas style="cursor: auto;" id="stars"></canvas>
+<h1 id="FPS"></h1>
+<div id="progress-container"><div id="progress-bar"></div></div>
+<div id="score-record"><span id="score">Puntos: 0</span><span id="record">Récord: 0</span></div>
+<div style="cursor: auto;" id="mainmenu"><h1>Neon Spinner</h1><button id="playbtn">Jugar</button><br><button id="shopbtn" disabled>Tienda</button></div>
+<div id="gameover">GAME OVER🫤<br><button id="retry">Reintentar</button><button id="backmenu">Volver al menú</button><br><button id="CambiarSkin">Cambiar Skin</button></div>
+<canvas id="game"></canvas>
+<audio id="bgmusic" loop src="https://freesound.org/data/previews/539/539777_10224925-lq.mp3" autoplay></audio>
+<script>
+// Ajustes iniciales
+const canvas=document.getElementById("game"),ctx=canvas.getContext("2d");
+canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+let sw=canvas.width,sh=canvas.height;
+
+// Fondo de estrellas
+const starsCanvas=document.getElementById("stars"),starsCtx=starsCanvas.getContext("2d");
+starsCanvas.width=sw;starsCanvas.height=sh;
+function randomStar(){return {x:Math.random()*sw,y:Math.random()*sh,r:Math.random()*1.2+0.2,alpha:Math.random(),dx:(Math.random()-0.5)*0.2,dy:(Math.random()-0.5)*0.2,dAlpha:(Math.random()-0.5)*0.02};}
+let starsArr=Array.from({length:120},randomStar);
+function drawStars(){
+    starsCtx.clearRect(0,0,sw,sh);
+    for(let s of starsArr){
+        starsCtx.beginPath();
+        starsCtx.arc(s.x,s.y,s.r,0,2*Math.PI);
+        starsCtx.fillStyle=`rgba(255,255,255,${Math.abs(s.alpha)})`;
+        starsCtx.shadowColor="#fff";starsCtx.shadowBlur=8;
+        starsCtx.fill();
+        s.x+=s.dx;s.y+=s.dy;s.alpha+=s.dAlpha;
+        if(s.alpha<0.1||s.alpha>1)s.dAlpha*=-1;
+        if(s.x<0||s.x>sw||s.y<0||s.y>sh)Object.assign(s,randomStar());
+    }
+    requestAnimationFrame(drawStars);
+}
+drawStars();
+
+// Color aleatorio para las skins
+function generarColorHexAleatorio(){const numeroAleatorio = Math.floor(Math.random() * 0xFFFFFF);const colorHex = "#" + numeroAleatorio.toString(16).padStart(6, "0");return colorHex;}
+
+// Jugador y skins
+let player={x:sw/2,y:sh/2,r:25,angle:0},projectiles=[],particles=[],score=0,record=localStorage.getItem("neonSpinnerRecord")||0,playing=false,projectileSpeed=15;
+document.getElementById("record").innerText="Récord: " + record;
+const playerSkins = ["X","Y","I","π","●","★","△","♠", "♣", "♥", "◆","✧","𖣘","✠","✟","⛥","☢","☣","卐","67","🗿"].map(type => ({ type, color: generarColorHexAleatorio() }));
+let currentSkin=playerSkins[(Math.floor(Math.random() * playerSkins.length))];
+document.addEventListener("mousemove",e=>{if(!playing)return;player.x=e.clientX;player.y=e.clientY;});
+
+// Multiplicador
+let multiplier={active:false,x:0,y:0,r:28,show:false,timer:0,effectTimer:0},multiplierEffectActive=false,multiplierEffectTimeout=null;
+function spawnMultiplier(){
+    if(multiplier.show||multiplierEffectActive||!playing)return;
+    multiplier.x=Math.random()*(canvas.width-100)+50;
+    multiplier.y=Math.random()*(canvas.height-100)+50;
+    multiplier.show=true;
+    multiplier.timer=setTimeout(()=>{multiplier.show=false;},4000);
+}
+function drawMultiplier(){
+    if(!multiplier.show)return;
+    ctx.save();ctx.beginPath();ctx.arc(multiplier.x,multiplier.y,multiplier.r,0,2*Math.PI);
+    ctx.strokeStyle='#ffeb3b';ctx.lineWidth=4;ctx.shadowBlur=18;ctx.shadowColor='#fff700';ctx.stroke();
+    ctx.font="bold 32px 'Orbitron', Arial";ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillStyle='#fff700';ctx.globalAlpha=0.85;ctx.fillText('x2',multiplier.x,multiplier.y);ctx.globalAlpha=1;ctx.restore();
+}
+function checkMultiplierCollision(){
+    if(!multiplier.show)return;
+    const dx=player.x-multiplier.x,dy=player.y-multiplier.y;
+    if(Math.hypot(dx,dy)<player.r+multiplier.r){
+        multiplier.show=false;clearTimeout(multiplier.timer);
+        multiplierEffectActive=true;multiplier.active=true;
+        if(multiplierEffectTimeout) clearTimeout(multiplierEffectTimeout);
+        multiplierEffectTimeout=setTimeout(()=>{multiplierEffectActive=false;multiplier.active=false;},5000);
+    }
+}
+
+// Jugador
+function drawPlayer(){
+    player.angle+=0.12;
+    ctx.save();ctx.translate(player.x,player.y);ctx.rotate(player.angle);
+    ctx.strokeStyle=currentSkin.color;ctx.lineWidth=2;ctx.shadowBlur=20;ctx.shadowColor=currentSkin.color;
+    ctx.font="100px 'Press Start 2P', monospace";ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.strokeText(currentSkin.type,0,0);ctx.globalAlpha=0.15;ctx.fillStyle=currentSkin.color;ctx.fillText(currentSkin.type,0,0);ctx.globalAlpha=1;
+    ctx.restore();
+}
+
+// Partículas
+function spawnProjectileParticles(px,py){
+    for(let i=0;i<15;i++){particles.push({x:px,y:py,dx:(Math.random()-0.5)*5,dy:(Math.random()-0.5)*5,r:2+Math.random()*3,color: generarColorHexAleatorio(),life:50});}
+}
+function drawParticles(){
+    for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.x+=p.dx;p.y+=p.dy;p.life--;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=p.color;ctx.shadowBlur=15;ctx.shadowColor=p.color;ctx.fill();if(p.life<=0)particles.splice(i,1);}
+}
+
+// Proyectiles
+function spawnProjectile(){
+    if(!playing)return;
+    const side=Math.floor(Math.random()*4);let x,y;
+    if(side===0){x=Math.random()*canvas.width;y=-30;}
+    else if(side===1){x=canvas.width+30;y=Math.random()*canvas.height;}
+    else if(side===2){x=Math.random()*canvas.width;y=canvas.height+30;}
+    else{x=-30;y=Math.random()*canvas.height;}
+    const angle=Math.atan2(player.y-y,player.x-x);
+    projectiles.push({x,y,vx:Math.cos(angle)*projectileSpeed,vy:Math.sin(angle)*projectileSpeed,r:14+Math.random()*11,color:`hsl(${Math.random()*360},100%,60%)`});
+    setTimeout(spawnProjectile,250+Math.random()*250);
+}
+function drawProjectiles(){
+    ctx.save();ctx.globalAlpha=0.05;ctx.fillStyle="#05050a";ctx.fillRect(0,0,canvas.width,canvas.height);ctx.restore();
+    for(let i=projectiles.length-1;i>=0;i--){
+        const p=projectiles[i];p.x+=p.vx;p.y+=p.vy;
+        ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,2*Math.PI);ctx.fillStyle=p.color;ctx.shadowBlur=20;ctx.shadowColor=p.color;ctx.fill();
+        const dx=p.x-player.x,dy=p.y-player.y;
+        if(Math.hypot(dx,dy)<p.r+player.r){spawnProjectileParticles(p.x,p.y);endGame();projectiles.splice(i,1);continue;}
+        if(p.x<-50||p.x>canvas.width+50||p.y<-50||p.y>canvas.height+50){
+            spawnProjectileParticles(p.x,p.y);projectiles.splice(i,1);
+            let points=multiplierEffectActive?2:1;score+=points;projectileSpeed+=0.05;document.getElementById("score").innerText="Puntos: "+score;
+            if(score>record){record=score;localStorage.setItem("neonSpinnerRecord",record);document.getElementById("record").innerText="Récord: "+record;}
+            updateProgressBar();
+        }
+    }
+}
+
+// Game over
+function endGame(){playing=false;document.getElementById("gameover").style.display="block";document.getElementById("html").style.cursor="auto";}
+
+// Update loop
+function update(){if(!playing)return;ctx.clearRect(0,0,canvas.width,canvas.height);drawPlayer();drawProjectiles();drawParticles();drawMultiplier();checkMultiplierCollision();requestAnimationFrame(update);}
+
+// Multiplicador aleatorio
+function scheduleMultiplier(){if(!playing)return;setTimeout(()=>{if(playing&&!multiplierEffectActive) spawnMultiplier();scheduleMultiplier();},20000+Math.random()*15000);}
+
+// Progress bar
+const worldRecord=178;
+function updateProgressBar(){const bar=document.getElementById("progress-bar");let percent=Math.min(score,record)/record*100;bar.style.width=percent+"%";if(score>=worldRecord){bar.style.background="linear-gradient(90deg, #ff595e 60%, #be1e2d 100%)";bar.style.boxShadow="0 0 12px #ff595e99"}else{bar.style.background="linear-gradient(90deg,#00eaff 60%,#00b6c9 100%)";bar.style.boxShadow="0 0 12px #00eaff99"}}
+                                                                                                                                                                                    //background:linear-gradient(90deg,#00eaff 60%,#00b6c9 100%);box-shadow:0 0 12px #00eaff99;
+// Botones
+document.getElementById("retry").onclick=()=>{score=0;projectileSpeed=15;projectiles=[];particles=[];player={x:canvas.width/2,y:canvas.height/2,r:25,angle:0};document.getElementById("score").innerText="Puntos: 0";document.getElementById("gameover").style.display="none";document.getElementById("html").style.cursor="none";playing=true;spawnProjectile();update();updateProgressBar();multiplier.show=false;multiplier.active=false;multiplierEffectActive=false;if(multiplier.timer) clearTimeout(multiplier.timer); if(multiplierEffectTimeout) clearTimeout(multiplierEffectTimeout);scheduleMultiplier();}
+document.getElementById("backmenu").onclick=()=>location.reload();
+document.getElementById("playbtn").onclick=()=>{document.getElementById("mainmenu").style.display="none";document.getElementById("score").style.display="inline";document.getElementById("record").style.display="inline";document.getElementById("html").style.cursor="none";playing=true;spawnProjectile();update();updateProgressBar();multiplier.show=false;multiplier.active=false;multiplierEffectActive=false;if(multiplier.timer) clearTimeout(multiplier.timer); if(multiplierEffectTimeout) clearTimeout(multiplierEffectTimeout);scheduleMultiplier();}
+document.getElementById("CambiarSkin").onclick=()=>{let newSkin;do{newSkin=playerSkins[Math.floor(Math.random()*playerSkins.length)];}while(newSkin===currentSkin&&playerSkins.length>1);currentSkin=newSkin;}
+
+// FPS
+let startTime=Date.now(),frame=0;
+function tick(){let time=Date.now();frame++;if(time-startTime>1000){document.getElementById("FPS").innerHTML=(frame/((time-startTime)/1000)).toFixed(2)+" FPS";startTime=time;frame=0;}window.requestAnimationFrame(tick);}
+tick();
+
+// Resize
+window.addEventListener('resize',()=>{sw=window.innerWidth;sh=window.innerHeight;starsCanvas.width=sw;starsCanvas.height=sh;canvas.width=sw;canvas.height=sh;});
+</script>
+</body>
+</html>

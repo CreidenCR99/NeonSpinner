@@ -1,0 +1,50 @@
+/* ============================================
+   AUTH OVERLAY
+============================================ */
+
+/* Título del panel de auth */
+#auth-title {
+    font-weight: 100;
+}
+
+/* Fondo semitransparente que cubre toda la pantalla */
+.auth-overlay {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 9999;
+}
+
+/* Tarjeta principal de login/registro */
+.auth-card {
+    background: var(--card-bg);
+    padding: 18px;
+    border-radius: 10px;
+    width: 320px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+    text-align: center;
+}
+
+.auth-card input {
+    width: 100%;
+    padding: 8px;
+    margin: 8px 0;
+    border-radius: 6px;
+    border: 1px solid #333;
+    background: rgba(255, 255, 255, 0.03);
+    color: #fff;
+}
+
+.auth-row {
+    display: flex;
+    gap: 8px;
+}
+
+.auth-msg {
+    margin-top: 8px;
+    min-height: 18px;
+    color: #f1c40f;
+}

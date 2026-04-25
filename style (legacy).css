@@ -1,0 +1,1298 @@
+/* ============================================
+   RESET & DESIGN TOKENS (variables globales)
+============================================ */
+
+:root {
+    /* Colores base del tema */
+    --bg: #05050a;
+    --text-color: #ffffff;
+    --card-bg: rgba(8, 8, 12, 0.95);
+
+    /* Neones principales (cian, acento rojo, verde, naranja) */
+    --neon-1: #00eaff;
+    --neon-2: #00b6c9;
+    --neon-red: #ff4081;
+    --neon-red-dark: #be1e2d;
+    --neon-green: #40ff89;
+    --neon-orange: #ffb347;
+
+    /* Variantes con alfa (para brillos y fondos) */
+    --neon-alpha-1: #00eaff99;
+    --neon-soft-1: #00eaff44;
+    --neon-soft-2: #00eaff55;
+    --neon-strong-1: #00eaffcc;
+
+    /* Superficies y overlays reutilizados */
+    --surface-dark: #0a1428;
+    --surface-mid: #222222;
+    --surface-mid-alt: #333333;
+    --overlay-strong: rgba(10, 20, 40, 0.98);
+    --overlay-soft: rgba(10, 20, 40, 0.85);
+
+    /* Sombras típicas de neón */
+    --shadow-strong: 0 0 60px var(--neon-alpha-1);
+    --shadow-soft: 0 0 18px var(--neon-alpha-1);
+}
+
+/* ============================================
+   RESET BÁSICO / UTILIDADES
+============================================ */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    overflow: hidden;
+    background: var(--bg);
+    font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+    color: var(--text-color);
+}
+
+/* Utilidad simple para ocultar elementos */
+.hidden {
+    display: none;
+}
+
+/* Click feedback para varios botones “importantes” */
+button:active,
+.btn:active,
+.btn-alt:active,
+.btn.small:active,
+#menu-leaderboard-btn:active,
+#playbtn:active,
+#play-destruction:active {
+    transform: scale(0.93);
+    filter: brightness(0.85);
+}
+
+/* Animación de aparición para modales principales */
+.auth-card,
+.leaderboard-panel,
+#inventory-modal {
+    animation: modal-pop 0.25s ease-out;
+}
+
+/* ============================================
+   CANVAS (fondo y juego)
+============================================ */
+
+.bg-canvas,
+.game-canvas {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: -2;
+}
+
+/* ============================================
+   HUD: FPS
+============================================ */
+
+#FPS {
+    position: absolute;
+    top: 35px;
+    right: 0;
+    margin: 0;
+    padding: 0 14px;
+    font-size: medium;
+    color: var(--neon-soft-2);
+    z-index: 50;
+    transition: 0.1s;
+}
+
+/* ============================================
+   HUD: BARRA DE PROGRESO
+============================================ */
+
+#progress-container {
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 18px;
+    background: var(--overlay-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 30;
+    box-shadow: 0 2px 18px var(--neon-soft-1);
+}
+
+#progress-bar {
+    width: 0%;
+    height: 7px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, var(--neon-1) 60%, var(--neon-2) 100%);
+    box-shadow: 0 0 12px var(--neon-alpha-1);
+    transition:
+        width 0.25s linear,
+        box-shadow 0.2s;
+    animation: bar-pulse 2.2s infinite ease-in-out;
+}
+
+#progress-text {
+    position: absolute;
+    left: 50%;
+    top: 60%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    pointer-events: none;
+
+    /* Degradado aplicado al texto usando background-clip */
+    background: linear-gradient(90deg,
+            var(--neon-orange) 60%,
+            var(--neon-red) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    /* Reborde negro */
+    -webkit-text-stroke: 1px black;
+
+    /* Sombra para dar efecto de brillo */
+    text-shadow:
+        0 0 6px rgba(255, 100, 0, 0.7),
+        0 0 12px rgba(255, 0, 0, 0.6);
+
+    transition:
+        transform 0.15s ease,
+        text-shadow 0.15s ease;
+}
+
+/* ============================================
+   HUD: SCORE + RÉCORD
+============================================ */
+
+#score-record {
+    position: fixed;
+    top: 22px;
+    width: 100vw;
+    display: flex;
+    gap: 32px;
+    justify-content: center;
+    align-items: center;
+    z-index: 31;
+}
+
+#score,
+#record {
+    font-size: 1.3rem;
+    color: var(--neon-1);
+    text-shadow: 0 0 10px var(--neon-1);
+    margin: 0 8px;
+    user-select: none;
+}
+
+/* ============================================
+   GAME OVER (panel central)
+============================================ */
+
+#gameover {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3rem;
+    text-align: center;
+    display: none;
+    z-index: 10;
+    user-select: none;
+}
+
+#gameover button {
+    margin: 10px;
+    padding: 12px 24px;
+    font-size: 1.3rem;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#retry {
+    background: var(--neon-1);
+    color: var(--bg);
+}
+
+#backmenu {
+    background: var(--neon-red);
+    color: var(--text-color);
+}
+
+#CambiarSkin {
+    background: var(--neon-green);
+    color: var(--bg);
+}
+
+/* ============================================
+   MAIN MENU (panel central)
+============================================ */
+
+#mainmenu {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.95);
+    background: rgba(10, 20, 40, 0.97);
+    padding: 60px 70px 50px;
+    min-width: 340px;
+    border-radius: 30px;
+    text-align: center;
+    z-index: 20;
+    color: var(--text-color);
+    box-shadow:
+        var(--shadow-strong),
+        0 0 10px var(--neon-soft-2),
+        0 0 0 4px var(--neon-soft-1) inset;
+    animation: menu-pop 1s cubic-bezier(0.23, 1.12, 0.32, 1) forwards;
+}
+
+#mainmenu h1 {
+    font-size: 3.2rem;
+    margin-bottom: 35px;
+    color: var(--neon-1);
+    letter-spacing: 2px;
+    text-shadow:
+        0 0 25px #00838f,
+        0 0 8px #00838f,
+        0 0 2px #ffffff;
+    animation: neon-glow 2s infinite alternate;
+}
+
+#mainmenu button {
+    margin: 20px 0;
+    padding: 18px 48px;
+    font-size: 1.5rem;
+    border-radius: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    background: linear-gradient(90deg, var(--neon-1) 60%, var(--neon-2) 100%);
+    color: var(--bg);
+    box-shadow:
+        var(--shadow-soft),
+        0 0 4px var(--neon-soft-2);
+    transition:
+        background 0.2s,
+        transform 0.15s,
+        box-shadow 0.2s;
+    animation: button-fadein 1.2s cubic-bezier(0.23, 1.12, 0.32, 1) 0.2s backwards;
+}
+
+#mainmenu button:enabled:hover {
+    transform: scale(1.07);
+    background: linear-gradient(90deg, var(--neon-2) 60%, var(--neon-1) 100%);
+    box-shadow:
+        0 0 30px var(--neon-strong-1),
+        0 0 8px var(--neon-alpha-1);
+}
+
+#mainmenu button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: #222c;
+    color: #aaa;
+    box-shadow: none;
+}
+
+/* Borde glow animado del menú principal */
+#mainmenu::before {
+    content: "";
+    position: absolute;
+    inset: -6px;
+    border-radius: 36px;
+    background:
+        linear-gradient(45deg,
+            var(--neon-1) 0%,
+            var(--neon-1) 20%,
+            transparent 20%,
+            transparent 80%,
+            var(--neon-1) 80%,
+            var(--neon-1) 100%),
+        linear-gradient(-45deg,
+            var(--neon-2) 0%,
+            var(--neon-2) 20%,
+            transparent 20%,
+            transparent 80%,
+            var(--neon-2) 80%,
+            var(--neon-2) 100%);
+    filter: blur(10px) brightness(1.3);
+    opacity: 0.7;
+    animation: border-rotate 4s linear infinite;
+    pointer-events: none;
+}
+
+/* Badge "Nuevo!" sobre el botón de modo destrucción */
+#new-text {
+    position: absolute;
+    top: -15px;
+    left: -12px;
+    background: var(--neon-red);
+    color: var(--text-color);
+    font-size: 0.65rem;
+    font-weight: bold;
+    padding: 4px 10px;
+    border-radius: 12px;
+    box-shadow:
+        0 0 12px var(--neon-red),
+        0 0 6px var(--neon-red);
+    user-select: none;
+    pointer-events: none;
+    z-index: 10;
+    animation: escala 0.75s infinite alternate;
+}
+
+/* Contenedor para posicionar badges relativos a cada botón de modo */
+#mode-btn-wrap {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    /* mantener alineación con otros botones */
+}
+
+/* ============================================
+   INVENTORY MODAL (skins / color)
+============================================ */
+
+#inventory-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    min-width: 780px;
+    min-height: 340px;
+    padding: 38px 48px;
+    background: var(--overlay-strong);
+    border-radius: 28px;
+    box-shadow:
+        var(--shadow-strong),
+        0 0 10px var(--neon-soft-2),
+        0 0 0 4px var(--neon-soft-1) inset;
+    display: none;
+    z-index: 100;
+    color: var(--text-color);
+    animation: fadeIn 0.2s;
+}
+
+/* Hack controlado por JS: cuando style.display = "block" → usar flex */
+#inventory-modal[style*="display: block"] {
+    display: flex !important;
+}
+
+.inventory-layout {
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+    width: 100%;
+    min-width: 780px;
+    min-height: 340px;
+    position: relative;
+}
+
+.inventory-left {
+    flex: 1;
+    min-width: 220px;
+}
+
+.inventory-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
+.inventory-tab {
+    padding: 10px 24px;
+    margin-right: 2px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 8px 8px 0 0;
+    border: none;
+    cursor: pointer;
+    background: var(--surface-dark);
+    color: var(--neon-1);
+    transition:
+        background 0.2s,
+        color 0.2s;
+}
+
+.inventory-tab.active {
+    background: linear-gradient(90deg, var(--neon-1) 60%, var(--neon-2) 100%);
+    color: var(--bg);
+    box-shadow: 0 0 12px var(--neon-alpha-1);
+}
+
+#skins-list {
+    margin-top: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.skin-item {
+    font-family: "Press Start 2P", monospace;
+    width: 56px;
+    height: 56px;
+    font-size: 2.1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 18px;
+    background: var(--surface-dark);
+    box-shadow: 0 0 8px var(--neon-soft-1);
+    cursor: pointer;
+    border: 2px solid transparent;
+    user-select: none;
+    transition:
+        border 0.2s,
+        box-shadow 0.2s,
+        background 0.2s,
+        transform 0.2s;
+}
+
+.skin-item.selected {
+    border: 2.5px solid var(--neon-1);
+    background: linear-gradient(90deg, var(--neon-1) 60%, var(--neon-2) 100%);
+    color: var(--bg);
+    box-shadow: var(--shadow-soft);
+    animation: spin-glow 2s infinite ease-in-out;
+}
+
+.skin-item:hover,
+.skin-item.selected:hover {
+    background: var(--surface-mid-alt);
+    box-shadow: 0 0 18px var(--neon-1);
+    transform: scale(1.08);
+}
+
+.skin-item.selected canvas {
+    animation: border-rotate 2s infinite linear;
+}
+
+.inventory-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#big-skin-view {
+    font-family: "Press Start 2P", monospace;
+    font-size: 120px;
+    margin-bottom: 8px;
+    text-shadow:
+        0 0 30px var(--neon-1),
+        0 0 8px var(--neon-alpha-1);
+    transition:
+        color 0.2s,
+        text-shadow 0.2s;
+    animation: border-rotate 2s infinite linear;
+}
+
+/* Panel de color (segunda pestaña del inventario) */
+
+#color-panel {
+    display: block;
+}
+
+.color-help-text {
+    margin-top: 10px;
+    text-align: center;
+}
+
+#close-inventory {
+    position: absolute;
+    top: 18px;
+    right: 24px;
+    font-size: 2.2rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--text-color);
+    transition: color 0.2s;
+}
+
+#close-inventory:hover {
+    color: var(--neon-red);
+}
+
+#color-picker {
+    width: 100%;
+    height: 60px;
+    margin: 8px 0;
+    border-radius: 8px;
+    border: 2px solid var(--neon-1);
+    box-shadow: 0 0 8px var(--neon-alpha-1);
+    cursor: pointer;
+}
+
+/* ============================================
+   VERSION BUTTONS (BOTTOM LEFT)
+============================================ */
+
+#versions-btn {
+    position: fixed;
+    left: 18px;
+    bottom: 18px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    background: linear-gradient(90deg, var(--neon-1) 60%, var(--neon-2) 100%);
+    color: var(--bg);
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+    z-index: 60;
+    box-shadow:
+        0 0 16px var(--neon-alpha-1),
+        0 0 6px var(--neon-soft-2);
+}
+
+#versions-btn:hover {
+    transform: scale(1.07);
+    background: linear-gradient(90deg, var(--neon-2) 60%, var(--neon-1) 100%);
+    box-shadow:
+        0 0 30px var(--neon-strong-1),
+        0 0 8px var(--neon-alpha-1);
+}
+
+#versions-menu {
+    position: fixed;
+    left: 18px;
+    bottom: 64px;
+    padding: 10px;
+    min-width: 220px;
+    border-radius: 12px;
+    background: var(--overlay-strong);
+    box-shadow:
+        0 8px 30px #0008,
+        0 0 40px var(--neon-alpha-1);
+    font-size: 0.9rem;
+    color: var(--text-color);
+    z-index: 61;
+    display: none;
+}
+
+#versions-menu a {
+    display: block;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    color: var(--neon-1);
+    text-decoration: none;
+    border-radius: 8px;
+}
+
+#versions-menu a:hover {
+    background: rgba(0, 234, 255, 0.08);
+    color: var(--text-color);
+}
+
+
+/* ============================================
+   RESET RECORDS BUTTON
+============================================ */
+
+#reset-records-btn {
+    position: fixed;
+    left: 140px;
+    bottom: 18px;
+    padding: 10px 18px;
+    border-radius: 12px;
+    border: none;
+    font-size: 0.95rem;
+    font-weight: bold;
+    user-select: none;
+    cursor: pointer;
+    background: linear-gradient(90deg,
+            var(--neon-red) 60%,
+            var(--neon-red-dark) 100%);
+    color: var(--text-color);
+    box-shadow:
+        0 0 16px #ff408199,
+        0 0 6px #be1e2d55;
+    transition:
+        background 0.2s,
+        transform 0.15s,
+        box-shadow 0.2s;
+    z-index: 61;
+}
+
+#reset-records-btn:hover {
+    transform: scale(1.07);
+    background: linear-gradient(90deg,
+            var(--neon-red-dark) 60%,
+            var(--neon-red) 100%);
+    box-shadow:
+        0 0 30px #ff4081cc,
+        0 0 8px #be1e2d99;
+}
+
+/* ============================================
+   ANIMACIONES GLOBALES
+============================================ */
+
+@keyframes menu-pop {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -60%) scale(0.8);
+        filter: blur(8px);
+    }
+
+    60% {
+        opacity: 1;
+        transform: translate(-50%, -48%) scale(1.05);
+        filter: blur(0);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+        filter: blur(0);
+    }
+}
+
+@keyframes button-fadein {
+    0% {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes border-rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes neon-glow {
+
+    0%,
+    25% {
+        text-shadow:
+            0 0 25px #00838f,
+            0 0 8px #00838f,
+            0 0 2px #ffffff;
+    }
+
+    50% {
+        text-shadow:
+            0 0 40px var(--neon-2),
+            0 0 16px var(--neon-2),
+            0 0 8px #ffffff;
+    }
+
+    100% {
+        text-shadow:
+            0 0 40px var(--neon-1),
+            0 0 16px var(--neon-1),
+            0 0 8px #ffffff;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+@keyframes bar-pulse {
+    0% {
+        box-shadow: 0 0 12px var(--neon-alpha-1);
+    }
+
+    50% {
+        box-shadow: 0 0 20px var(--neon-1);
+    }
+
+    100% {
+        box-shadow: 0 0 12px var(--neon-alpha-1);
+    }
+}
+
+@keyframes spin-glow {
+    0% {
+        box-shadow: 0 0 10px var(--neon-alpha-1);
+    }
+
+    50% {
+        box-shadow: 0 0 20px var(--neon-1);
+    }
+
+    100% {
+        box-shadow: 0 0 10px var(--neon-alpha-1);
+    }
+}
+
+@keyframes modal-pop {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -48%) scale(0.92);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+@keyframes escala {
+    from {
+        transform: scale(0.8);
+    }
+
+    to {
+        transform: scale(1.2);
+    }
+}
+
+/* ============================================
+   AUTH OVERLAY & LEADERBOARD
+============================================ */
+
+/* Título del panel de auth */
+#auth-title {
+    font-weight: 100;
+}
+
+/* Fondo semitransparente que cubre toda la pantalla */
+.auth-overlay {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 9999;
+}
+
+/* Tarjeta principal de login/registro */
+.auth-card {
+    background: var(--card-bg);
+    padding: 18px;
+    border-radius: 10px;
+    width: 320px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+    text-align: center;
+}
+
+.auth-card input {
+    width: 100%;
+    padding: 8px;
+    margin: 8px 0;
+    border-radius: 6px;
+    border: 1px solid #333;
+    background: rgba(255, 255, 255, 0.03);
+    color: #fff;
+}
+
+.auth-row {
+    display: flex;
+    gap: 8px;
+}
+
+/* Botones básicos (login, registro, etc.) */
+.btn {
+    cursor: pointer;
+    border: none;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, var(--neon-1), var(--neon-2));
+    color: #05050a;
+    font-weight: 700;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    background: linear-gradient(90deg, var(--neon-2), var(--neon-1));
+    color: #fff;
+    box-shadow:
+        0 0 10px var(--neon-1),
+        0 0 18px var(--neon-2);
+}
+
+.btn.small {
+    padding: 6px 8px;
+    font-size: 0.9rem;
+}
+
+/* Botón alternativo (por ejemplo, registro) */
+.btn-alt {
+    background: linear-gradient(90deg, #ff8a80, #ff4081);
+    color: #fff;
+    border: none;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-alt:hover {
+    background: linear-gradient(90deg, #ff4081, #ff8a80);
+    /* invertimos el degradado */
+    color: #fff;
+    box-shadow:
+        0 0 10px #ff4081,
+        0 0 18px #ff8a80;
+    /* efecto glow */
+    transform: scale(1.05);
+    /* ligero zoom para dar sensación de interacción */
+}
+
+.auth-msg {
+    margin-top: 8px;
+    min-height: 18px;
+    color: #f1c40f;
+}
+
+/* Menú superior izquierdo (por ejemplo, login actual / nombre usuario) */
+.top-left-menu {
+    position: fixed;
+    left: 12px;
+    top: 12px;
+    z-index: 9000;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.top-left-menu button:hover {
+    transform: scale(1.1);
+    filter: brightness(1.25);
+}
+
+/* ============================================
+   LEADERBOARD PANEL
+============================================ */
+
+.leaderboard-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--overlay-strong);
+    padding: 24px 32px;
+    border-radius: 20px;
+    box-shadow:
+        var(--shadow-strong),
+        0 0 10px var(--neon-soft-2),
+        0 0 0 4px var(--neon-soft-1) inset;
+    color: var(--text-color);
+    z-index: 10000;
+    min-width: 500px;
+    max-width: 90vw;
+    max-height: 80vh;
+    overflow-y: auto;
+    display: none;
+    animation: fadeIn 0.2s;
+}
+
+/* Botón que abre el leaderboard desde el menú principal */
+#menu-leaderboard-btn {
+    background: linear-gradient(90deg,
+            var(--neon-orange) 60%,
+            var(--neon-red) 100%);
+    color: var(--bg);
+    transition: all 0.3s ease;
+}
+
+#menu-leaderboard-btn:hover {
+    background: linear-gradient(90deg,
+            var(--neon-red) 60%,
+            var(--neon-orange) 100%);
+    color: #fff;
+    /* texto más visible */
+    box-shadow:
+        0 0 12px var(--neon-red),
+        0 0 20px var(--neon-orange);
+}
+
+/* Botón de cierre (X) del leaderboard */
+#close-leaderboard {
+    position: absolute;
+    top: 18px;
+    right: 24px;
+    font-size: 2.2rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--text-color);
+    transition: color 0.2s;
+}
+
+#close-leaderboard:hover {
+    color: var(--neon-red);
+}
+
+/* Cabecera con título y botón de cierre */
+.lb-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-weight: 300;
+}
+
+/* Contenedor de las dos tablas (huida / destrucción) */
+.lb-tables {
+    display: flex;
+    gap: 12px;
+    flex-direction: column;
+}
+
+.lb-block {
+    margin-bottom: 10px;
+}
+
+.lb-block h4 {
+    margin: 8px 0;
+    font-weight: 100;
+    text-align: center;
+    color: var(--neon-1);
+    text-shadow:
+        0 0 10px var(--neon-1),
+        0 0 4px var(--neon-alpha-1);
+}
+
+/* Tabla de puntuaciones */
+.lb-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.lb-table th,
+.lb-table td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+    letter-spacing: 1px;
+}
+
+.lb-table thead th {
+    font-weight: 300;
+}
+
+.lb-table tbody tr {
+    transition:
+        background 0.12s ease,
+        color 0.12s ease;
+}
+
+.lb-table tbody tr:hover {
+    background: rgba(0, 234, 255, 0.1);
+    color: var(--neon-1);
+    text-shadow: 0 0 8px var(--neon-1);
+}
+
+/* Estado visual de botón deshabilitado (reutilizado en varias partes) */
+button.disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+/* Scrollbar del panel (solo WebKit/Blink) */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0000;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--neon-alpha-1);
+    border-radius: 10px;
+    box-shadow: 0 0 8px var(--neon-alpha-1);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--neon-alpha-1);
+}
+
+/* ============================================
+   PLAY MENU
+============================================ */
+
+#mode-select-menu {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 760px;
+    padding: 40px 48px;
+    background: var(--overlay-strong);
+    border-radius: 28px;
+    color: var(--text-color);
+    display: none;
+    z-index: 80;
+    /* Por debajo del inventario (100), por encima del mainmenu */
+    box-shadow:
+        var(--shadow-strong),
+        0 0 10px var(--neon-soft-2),
+        0 0 0 4px var(--neon-soft-1) inset;
+}
+
+#mode-select-menu[style*="display: block"] {
+    display: flex !important;
+}
+
+.mode-select-layout {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+/* Botones */
+.mode-btn {
+    padding: 12px 20px;
+    border-radius: 14px;
+    border: none;
+    font-size: 1.1rem;
+    background: linear-gradient(90deg, var(--neon-1), var(--neon-2));
+    color: var(--bg);
+    cursor: pointer;
+    font-weight: bold;
+    user-select: none;
+    box-shadow: 0 0 16px var(--neon-alpha-1);
+}
+
+.mode-btn:hover {
+    transform: scale(1.07);
+    box-shadow: 0 0 30px var(--neon-strong-1);
+}
+
+.mode-btn.main {
+    font-size: 1.25rem;
+    padding: 18px 28px;
+}
+
+/* Menú desplegable */
+#mode-legacy-menu {
+    display: none;
+    position: absolute;
+    margin-top: 10px;
+    background: var(--overlay-strong);
+    padding: 10px;
+    border-radius: 12px;
+    min-width: 200px;
+    box-shadow: 0 8px 30px #0008, 0 0 40px var(--neon-alpha-1);
+    z-index: 90;
+}
+
+#mode-legacy-menu a {
+    display: block;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    color: var(--neon-1);
+    text-decoration: none;
+}
+
+#mode-legacy-menu a:hover {
+    background: rgba(0, 234, 255, 0.1);
+    color: var(--text-color);
+}
+
+/* Botón de cierre (X) del leaderboard */
+#close-mode-menu {
+    position: absolute;
+    top: 18px;
+    right: 24px;
+    font-size: 2.2rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--text-color);
+    transition: color 0.2s;
+}
+
+#close-mode-menu:hover {
+    color: var(--neon-red);
+}
+
+/* Animación de "jolt" para el contador de puntos */
+.score-bump {
+    animation: score-bump-anim 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes score-bump-anim {
+    0% {
+        transform: scale(1) rotate(0deg);
+    }
+
+    25% {
+        transform: scale(1.2) rotate(-5deg);
+        color: var(--neon-orange);
+        text-shadow:
+            0 0 30px var(--neon-orange),
+            0 0 60px var(--neon-orange),
+            0 0 10px var(--neon-1);
+    }
+
+    50% {
+        transform: scale(1.3) rotate(5deg);
+        color: #fff;
+        text-shadow:
+            0 0 40px var(--neon-blue),
+            0 0 80px var(--neon-blue),
+            0 0 15px #fff;
+    }
+
+    75% {
+        transform: scale(1.2) rotate(-3deg);
+        color: #fff;
+        text-shadow:
+            0 0 25px var(--neon-blue),
+            0 0 50px var(--neon-blue),
+            0 0 8px #fff;
+    }
+
+    100% {
+        transform: scale(1) rotate(0deg);
+        /* Color y text-shadow vuelven a sus valores originales automáticamente */
+    }
+}
+
+/* ========================================
+   MAINTENANCE OVERLAY
+======================================== */
+#maintenance-overlay {
+    position: fixed;
+    inset: 0;
+    /* top:0; right:0; bottom:0; left:0; */
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(180deg, rgba(2, 6, 23, 0.96) 0%, rgba(8, 12, 30, 0.98) 100%);
+    color: #e6eef8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2147483647;
+    /* máximo para bloquear todo */
+    -webkit-font-smoothing: antialiased;
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    text-align: center;
+    padding: 1.5rem;
+    box-sizing: border-box;
+    pointer-events: auto;
+    /* captura interacciones para bloquear la página */
+}
+
+#maintenance-overlay .m-wrap {
+    max-width: 720px;
+    width: 100%;
+    padding: 2rem;
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015));
+    box-shadow: 0 10px 40px rgba(2, 6, 23, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.02);
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    align-items: center;
+}
+
+/*Tiene la misma animación neon glow*/
+#maintenance-title {
+    font-size: 3.2rem;
+    margin-bottom: 60px;
+    color: var(--neon-1);
+    letter-spacing: 2px;
+    text-shadow:
+        0 0 25px #00838f,
+        0 0 8px #00838f,
+        0 0 2px #ffffff;
+    animation: neon-glow 2s infinite alternate;
+}
+
+#maintenance-overlay h1 {
+    margin: 0;
+    font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+    letter-spacing: 0.2px;
+    font-weight: 700;
+}
+
+#maintenance-overlay p {
+    margin: 0;
+    font-size: clamp(0.95rem, 1.6vw, 1.05rem);
+    opacity: 0.95;
+}
+
+#maintenance-overlay small {
+    margin-top: 0.25rem;
+    display: block;
+    font-size: 0.85rem;
+    opacity: 0.75;
+}
+
+/* Logo / spinner */
+.m-logo {
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.25rem;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+    box-shadow: 0 4px 18px rgba(2, 6, 23, 0.5);
+}
+
+.spinner {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    box-sizing: border-box;
+    border: 4px solid rgba(255, 255, 255, 0.08);
+    border-top-color: #60a5fa;
+    /* color visible en el spinner */
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Asegurar lectura en pantallas pequeñas */
+@media (max-width:420px) {
+    #maintenance-overlay .m-wrap {
+        padding: 1.2rem;
+        border-radius: 10px;
+    }
+
+    .m-logo {
+        width: 56px;
+        height: 56px;
+    }
+}

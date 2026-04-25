@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Neon Spinner</title>
+    <style>
+        /* Reset y tipografías básicas */
+        :root {
+            --neon-1: #00eaff;
+            --neon-2: #00b6c9;
+            --neon-red: #ff4081;
+            --neon-green: #40ff89;
+            --neon-alpha-1: #00eaff99;
+            --bg: #05050a;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: var(--bg);
+            font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+            color: #fff;
+        }
+
+        /* Canvases de fondo y juego */
+        .bg-canvas,
+        .game-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: -2;
+        }
+
+        /* FPS */
+        #FPS {
+            color: #00eaff44;
+            font-size: medium;
+            position: absolute;
+            right: 0;
+            top: 35px;
+            z-index: 50;
+            transition: 0.1s;
+        }
+
+        /* Barra de progreso */
+        #progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 18px;
+            background: rgba(10, 20, 40, 0.85);
+            z-index: 30;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 18px #00eaff44;
+        }
+
+        #progress-bar {
+            height: 7px;
+            border-radius: 8px;
+            background: linear-gradient(90deg, var(--neon-1) 60%, var(--neon-2) 100%);
+            box-shadow: 0 0 12px var(--neon-alpha-1);
+            width: 0%;
+            transition: width 0.25s cubic-bezier(.23, 1.12, .32, 1), box-shadow 0.2s;
+        }
+
+        /* Score / record */
+        #score-record {
+            position: fixed;
+            top: 22px;
+            width: 100vw;
+            display: flex;
+            gap: 32px;
+            align-items: center;
+            justify-content: center;
+            z-index: 31;
+        }
+
+        #score,
+        #record {
+            font-size: 1.3rem;
+            color: var(--neon-1);
+            text-shadow: 0 0 10px var(--neon-1);
+            margin: 0 8px;
+        }
+
+        /* Game over modal */
+        #gameover {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            text-align: center;
+            font-size: 3rem;
+            display: none;
+            z-index: 10;
+            user-select: none;
+        }
+
+        #gameover button {
+            margin: 10px;
+            padding: 12px 24px;
+            font-size: 1.3rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        #retry {
+            background: var(--neon-1);
+            color: #05050a;
+        }
+
+        #backmenu {
+            background: var(--neon-red);
+            color: white;
+        }
+
+        #CambiarSkin {
+            background: var(--neon-green);
+            color: var(--bg);
+        }
+
+        /* Main menu */
+        #mainmenu {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            background: rgba(10, 20, 40, 0.97);
+            border-radius: 30px;
+            padding: 60px 70px 50px 70px;
+            text-align: center;
+            z-index: 20;
+            min-width: 340px;
+            box-shadow: 0 0 60px var(--neon-alpha-1), 0 0 10px #00eaff55, 0 0 0 4px #00eaff22 inset;
+            color: #fff;
+        }
+
+        #mainmenu h1 {
+            font-size: 3.2rem;
+            color: var(--neon-1);
+            margin-bottom: 35px;
+            text-shadow: 0 0 25px #00838f, 0 0 8px #00838f, 0 0 2px #fff;
+            letter-spacing: 2px;
+            animation: neon-glow 2s infinite alternate;
+        }
+
+        #mainmenu button {
+            margin: 20px 0;
+            padding: 18px 48px;
+            font-size: 1.5rem;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            background: linear-gradient(90deg, var(--neon-1) 60%, var(--neon-2) 100%);
+            color: var(--bg);
+            font-weight: bold;
+            box-shadow: 0 0 18px var(--neon-alpha-1), 0 0 4px #00eaff55;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+            outline: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #mainmenu button:enabled:hover {
+            background: linear-gradient(90deg, var(--neon-2) 60%, var(--neon-1) 100%);
+            transform: scale(1.07);
+            box-shadow: 0 0 30px #00eaffcc, 0 0 8px var(--neon-alpha-1);
+        }
+
+        #mainmenu button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: #222c;
+            color: #aaa;
+            box-shadow: none;
+        }
+
+        /* Animated glowing border */
+        #mainmenu::before {
+            content: "";
+            position: absolute;
+            inset: -6px;
+            border-radius: 36px;
+            z-index: -1;
+            pointer-events: none;
+            background:
+                linear-gradient(45deg, var(--neon-1) 0%, var(--neon-1) 20%, transparent 20%, transparent 80%, var(--neon-1) 80%, var(--neon-1) 100%),
+                linear-gradient(-45deg, var(--neon-2) 0%, var(--neon-2) 20%, transparent 20%, transparent 80%, var(--neon-2) 80%, var(--neon-2) 100%);
+            filter: blur(10px) brightness(1.3);
+            opacity: 0.7;
+            animation: border-rotate 4s linear infinite;
+        }
+
+        @keyframes border-rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes neon-glow {
+
+            0%,
+            25% {
+                text-shadow: 0 0 25px #00838f, 0 0 8px #00838f, 0 0 2px #fff;
+            }
+
+            50% {
+                text-shadow: 0 0 40px var(--neon-2), 0 0 16px var(--neon-2), 0 0 8px #fff;
+            }
+
+            100% {
+                text-shadow: 0 0 40px var(--neon-1), 0 0 16px var(--neon-1), 0 0 8px #fff;
+            }
+        }
+
+        /* Accesibilidad y visibilidad */
+        #score,
+        #record {
+            user-select: none;
+        }
+
+        /* INVENTARIO MODAL */
+        #inventory-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(1);
+            background: rgba(10, 20, 40, 0.98);
+            border-radius: 28px;
+            box-shadow: 0 0 60px var(--neon-alpha-1), 0 0 10px #00eaff55, 0 0 0 4px #00eaff22 inset;
+            z-index: 100;
+            padding: 38px 48px 38px 48px;
+            min-width: 600px;
+            min-height: 340px;
+            display: none;
+            color: #fff;
+            animation: fadeIn 0.2s;
+        }
+
+        #inventory-modal[style*="display: block"] {
+            display: flex !important;
+        }
+
+        #inventory-modal .inventory-tab {
+            background: #0a1428;
+            color: var(--neon-1);
+            border: none;
+            border-radius: 8px 8px 0 0;
+            padding: 10px 24px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-right: 2px;
+            transition: background 0.2s, color 0.2s;
+            outline: none;
+        }
+
+        #inventory-modal .inventory-tab.active {
+            background: linear-gradient(90deg, var(--neon-1) 60%, var(--neon-2) 100%);
+            color: var(--bg);
+            box-shadow: 0 0 12px var(--neon-alpha-1);
+        }
+
+        #skins-list {
+            margin-top: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .skin-capsule {
+            font-family: "Press Start 2P", monospace;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px;
+            height: 56px;
+            border-radius: 18px;
+            background: #0a1428;
+            box-shadow: 0 0 8px #00eaff44;
+            font-size: 2.1rem;
+            color: #fff;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border 0.2s, box-shadow 0.2s, background 0.2s;
+            user-select: none;
+        }
+
+        .skin-capsule.selected {
+            border: 2.5px solid var(--neon-1);
+            background: linear-gradient(90deg, var(--neon-1) 60%, var(--neon-2) 100%);
+            color: var(--bg);
+            box-shadow: 0 0 18px var(--neon-alpha-1);
+        }
+
+        #big-skin-view {
+            font-family: "Press Start 2P", monospace;
+            font-size: 120px;
+            text-shadow: 0 0 30px var(--neon-1), 0 0 8px var(--neon-alpha-1);
+            margin-bottom: 8px;
+            transition: color 0.2s, text-shadow 0.2s;
+        }
+
+        #close-inventory {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 2.2rem;
+            cursor: pointer;
+            position: absolute;
+            top: 18px;
+            right: 24px;
+            z-index: 101;
+            transition: color 0.2s;
+        }
+
+        #close-inventory:hover {
+            color: var(--neon-red);
+        }
+
+        #color-picker {
+            border-radius: 8px;
+            border: 2px solid var(--neon-1);
+            box-shadow: 0 0 8px var(--neon-alpha-1);
+            margin-top: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="stars" class="bg-canvas" aria-hidden="true"></canvas>
+
+    <h1 id="FPS" aria-live="polite"></h1>
+
+    <div id="progress-container" aria-hidden="true">
+        <div id="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+
+    <div id="score-record" aria-hidden="true">
+        <span id="score">Puntos: 0</span>
+        <span id="record">Récord: 0</span>
+    </div>
+
+    <div id="mainmenu" role="dialog" aria-modal="true">
+        <h1>Neon Spinner</h1>
+        <button id="playbtn" type="button">Jugar</button>
+        <br />
+        <button id="inventorybtn" type="button">Inventario</button>
+    </div>
+
+    <!-- Inventario Modal -->
+    <div id="inventory-modal" role="dialog" aria-modal="true" style="display:none;">
+        <div style="display:flex;flex-direction:row;gap:40px;min-width:600px;min-height:340px;">
+            <!-- Pestañas a la izquierda -->
+            <div style="flex:1;min-width:220px;">
+                <div style="display:flex;gap:8px;margin-bottom:18px;">
+                    <button id="tab-skins" type="button" class="inventory-tab active">Skins</button>
+                    <button id="tab-color" type="button" class="inventory-tab">Color</button>
+                </div>
+                <div id="skins-panel">
+                    <!-- Aquí se mostrarán las skins en cápsulas -->
+                    <div id="skins-list" style="display:flex;flex-wrap:wrap;gap:12px;"></div>
+                </div>
+                <div id="color-panel" style="display:none;">
+                    <input id="color-picker" type="color" value="#00eaff" style="width:100%;height:60px;">
+                    <div style="margin-top:10px;text-align:center;">Elige el color de tu skin</div>
+                </div>
+            </div>
+            <!-- Vista grande de la skin a la derecha -->
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                <div id="big-skin-view" style="font-size:120px;text-shadow:0 0 30px #00eaff;">?</div>
+            </div>
+        </div>
+        <button id="close-inventory" type="button"
+            style="position:absolute;top:18px;right:24px;font-size:1.5rem;">&times;</button>
+    </div>
+
+    <div id="gameover" role="alert" aria-hidden="true">
+        GAME OVER🫤
+        <br />
+        <button id="retry" type="button">Reintentar</button>
+        <button id="backmenu" type="button">Volver al menú</button>
+        <br />
+        <button id="CambiarSkin" type="button">Cambiar Skin</button>
+    </div>
+
+    <canvas id="game" class="game-canvas" aria-label="Canvas del juego"></canvas>
+
+    <!-- Música de fondo (sin autoplay forzado para evitar bloqueos del navegador) -->
+    <audio id="bgmusic" loop src="https://freesound.org/data/previews/539/539777_10224925-lq.mp3"></audio>
+
+    <script defer>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Canvas principal y contexto
+            const canvas = document.getElementById('game');
+            const ctx = canvas.getContext('2d');
+
+            // Canvas de estrellas
+            const starsCanvas = document.getElementById('stars');
+            const starsCtx = starsCanvas.getContext('2d');
+
+            // Elementos UI
+            const scoreEl = document.getElementById('score');
+            const recordEl = document.getElementById('record');
+            const progressBar = document.getElementById('progress-bar');
+            const mainMenu = document.getElementById('mainmenu');
+            const gameOverEl = document.getElementById('gameover');
+            const playBtn = document.getElementById('playbtn');
+            const retryBtn = document.getElementById('retry');
+            const backMenuBtn = document.getElementById('backmenu');
+            const changeSkinBtn = document.getElementById('CambiarSkin');
+            const htmlRoot = document.documentElement; // para cambiar cursor
+            // INVENTARIO
+            const inventoryBtn = document.getElementById('inventorybtn');
+            const inventoryModal = document.getElementById('inventory-modal');
+            const closeInventoryBtn = document.getElementById('close-inventory');
+            const tabSkins = document.getElementById('tab-skins');
+            const tabColor = document.getElementById('tab-color');
+            const skinsPanel = document.getElementById('skins-panel');
+            const colorPanel = document.getElementById('color-panel');
+            const skinsList = document.getElementById('skins-list');
+            const bigSkinView = document.getElementById('big-skin-view');
+            const skinName = document.getElementById('skin-name');
+            const colorPicker = document.getElementById('color-picker');
+
+            // Ajuste de tamaño
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                starsCanvas.width = canvas.width;
+                starsCanvas.height = canvas.height;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            // Variables de juego
+            let godMode = false; // Modo dios desactivado por defecto
+            // Activar/desactivar modo dios con la tecla G
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'g' || e.key === 'G') {
+                    godMode = !godMode;
+                    console.log('God Mode:', godMode ? 'ON' : 'OFF');
+                }
+            });
+            let sw = canvas.width, sh = canvas.height;
+            let score = 0;
+            let record = parseInt(localStorage.getItem('neonSpinnerRecord')) || 0;
+            let playing = false;
+            let projectileSpeed = 15;
+            let projectiles = [];
+            let particles = [];
+            let multiplier = { active: false, x: 0, y: 0, r: 28, show: false, timer: null };
+            let multiplierEffectActive = false;
+            let multiplierEffectTimeout = null;
+
+            // Power-up: Escudo
+            let shield = { active: false, x: 0, y: 0, r: 28, show: false, timer: null };
+            let shieldEffectActive = false;
+            let shieldEffectTimeout = null;
+
+            recordEl.innerText = 'Récord: ' + record;
+
+            // Generador de color hex aleatorio
+            function generarColorHexAleatorio() {
+                const num = Math.floor(Math.random() * 0xFFFFFF);
+                return '#' + num.toString(16).padStart(6, '0');
+            }
+
+            // Skins (hecho más seguro: se han eliminado símbolos problemáticos)
+            const playerSkins = [
+                'X', 'Y', 'I', 'π', // letras
+                '●', '★', '△',    // formas
+                '♠', '♣', '♥', '◆',// casino
+                '✧', '𖣘', '✠', '✟', '⛥', // decorativos
+                '☢', '☣', '67', '🗿' // otros
+            ].map(type => ({ type, color: generarColorHexAleatorio() }));
+
+            let currentSkin = playerSkins[Math.floor(Math.random() * playerSkins.length)];
+
+            // Jugador
+            let player = { x: sw / 2, y: sh / 2, r: 25, angle: 0 };
+
+            // Estrellas
+            function randomStar() {
+                return {
+                    x: Math.random() * sw,
+                    y: Math.random() * sh,
+                    r: Math.random() * 1.2 + 0.2,
+                    alpha: Math.random(),
+                    dx: (Math.random() - 0.5) * 0.2,
+                    dy: (Math.random() - 0.5) * 0.2,
+                    dAlpha: (Math.random() - 0.5) * 0.02
+                };
+            }
+            let starsArr = Array.from({ length: 120 }, randomStar);
+
+            function drawStars() {
+                starsCtx.clearRect(0, 0, sw, sh);
+                for (let s of starsArr) {
+                    starsCtx.beginPath();
+                    starsCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+                    starsCtx.fillStyle = `rgba(255,255,255,${Math.abs(s.alpha)})`;
+                    starsCtx.shadowColor = '#fff';
+                    starsCtx.shadowBlur = 8;
+                    starsCtx.fill();
+
+                    s.x += s.dx;
+                    s.y += s.dy;
+                    s.alpha += s.dAlpha;
+                    if (s.alpha < 0.1 || s.alpha > 1) s.dAlpha *= -1;
+                    if (s.x < 0 || s.x > sw || s.y < 0 || s.y > sh) Object.assign(s, randomStar());
+                }
+                requestAnimationFrame(drawStars);
+            }
+            drawStars();
+
+            // Partículas
+            function spawnProjectileParticles(px, py) {
+                for (let i = 0; i < 15; i++) {
+                    particles.push({
+                        x: px,
+                        y: py,
+                        dx: (Math.random() - 0.5) * 5,
+                        dy: (Math.random() - 0.5) * 5,
+                        r: 2 + Math.random() * 3,
+                        color: generarColorHexAleatorio(),
+                        life: 50
+                    });
+                }
+            }
+            function drawParticles() {
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    const p = particles[i];
+                    p.x += p.dx;
+                    p.y += p.dy;
+                    p.life--;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = p.color;
+                    ctx.fill();
+                    if (p.life <= 0) particles.splice(i, 1);
+                }
+            }
+
+            // Proyectiles
+            function spawnProjectile() {
+                if (!playing) return;
+                const side = Math.floor(Math.random() * 4);
+                let x, y;
+                if (side === 0) { x = Math.random() * canvas.width; y = -30; }
+                else if (side === 1) { x = canvas.width + 30; y = Math.random() * canvas.height; }
+                else if (side === 2) { x = Math.random() * canvas.width; y = canvas.height + 30; }
+                else { x = -30; y = Math.random() * canvas.height; }
+                const angle = Math.atan2(player.y - y, player.x - x);
+                projectiles.push({
+                    x, y,
+                    vx: Math.cos(angle) * projectileSpeed,
+                    vy: Math.sin(angle) * projectileSpeed,
+                    r: 14 + Math.random() * 11,
+                    color: `hsl(${Math.random() * 360},100%,60%)`
+                });
+                setTimeout(spawnProjectile, 250 + Math.random() * 250);
+            }
+
+            function drawProjectiles() {
+                // sutil "trail" oscuro (muy ligero)
+                ctx.save();
+                ctx.globalAlpha = 0.05;
+                ctx.fillStyle = '#05050a';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.restore();
+
+                for (let i = projectiles.length - 1; i >= 0; i--) {
+                    const p = projectiles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, 2 * Math.PI);
+                    ctx.fillStyle = p.color;
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = p.color;
+                    ctx.fill();
+
+                    const dx = p.x - player.x;
+                    const dy = p.y - player.y;
+                    if (Math.hypot(dx, dy) < p.r + player.r) {
+                        spawnProjectileParticles(p.x, p.y);
+                        if (shieldEffectActive) {
+                            // Consume el escudo y sigue jugando
+                            shieldEffectActive = false;
+                            shield.active = false;
+                            if (shieldEffectTimeout) clearTimeout(shieldEffectTimeout);
+                            projectiles.splice(i, 1);
+                            continue;
+                        } else {
+                            endGame();
+                            projectiles.splice(i, 1);
+                            continue;
+                        }
+                    }
+
+                    if (p.x < -50 || p.x > canvas.width + 50 || p.y < -50 || p.y > canvas.height + 50) {
+                        spawnProjectileParticles(p.x, p.y);
+                        projectiles.splice(i, 1);
+
+                        const points = multiplierEffectActive ? 2 : 1;
+                        score += points;
+                        projectileSpeed += 0.05;
+                        scoreEl.innerText = 'Puntos: ' + score;
+
+                        if (score > record) {
+                            record = score;
+                            localStorage.setItem('neonSpinnerRecord', record);
+                            recordEl.innerText = 'Récord: ' + record;
+                        }
+                        updateProgressBar();
+                    }
+                }
+            }
+
+            // Progress bar
+            function updateProgressBar() {
+                const rec = Math.max(1, record); // evitar división por 0
+                const percent = Math.min(score, rec) / rec * 100;
+                progressBar.style.width = percent + '%';
+                if (score >= record) {
+                    progressBar.style.background = 'linear-gradient(90deg, #ff595e 60%, #be1e2d 100%)';
+                    progressBar.style.boxShadow = '0 0 12px #ff595e99';
+                } else {
+                    progressBar.style.background = 'linear-gradient(90deg,#00eaff 60%,#00b6c9 100%)';
+                    progressBar.style.boxShadow = '0 0 12px var(--neon-alpha-1)';
+                }
+            }
+
+            // Multiplicador
+            function spawnMultiplier() {
+                if (multiplier.show || multiplierEffectActive || !playing) return;
+                multiplier.x = Math.random() * (canvas.width - 100) + 50;
+                multiplier.y = Math.random() * (canvas.height - 100) + 50;
+                multiplier.show = true;
+                if (multiplier.timer) clearTimeout(multiplier.timer);
+                multiplier.timer = setTimeout(() => { multiplier.show = false; }, 4000);
+            }
+            function drawMultiplier() {
+                if (!multiplier.show) return;
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(multiplier.x, multiplier.y, multiplier.r, 0, 2 * Math.PI);
+                ctx.strokeStyle = '#ffeb3b';
+                ctx.lineWidth = 4;
+                ctx.shadowBlur = 18;
+                ctx.shadowColor = '#fff700';
+                ctx.stroke();
+                ctx.font = "bold 32px 'Orbitron', Arial";
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = '#fff700';
+                ctx.globalAlpha = 0.85;
+                ctx.fillText('x2', multiplier.x, multiplier.y);
+                ctx.globalAlpha = 1;
+                ctx.restore();
+            }
+            function checkMultiplierCollision() {
+                if (!multiplier.show) return;
+                const dx = player.x - multiplier.x, dy = player.y - multiplier.y;
+                if (Math.hypot(dx, dy) < player.r + multiplier.r) {
+                    multiplier.show = false;
+                    if (multiplier.timer) clearTimeout(multiplier.timer);
+                    multiplierEffectActive = true;
+                    multiplier.active = true;
+                    if (multiplierEffectTimeout) clearTimeout(multiplierEffectTimeout);
+                    multiplierEffectTimeout = setTimeout(() => {
+                        multiplierEffectActive = false;
+                        multiplier.active = false;
+                    }, 5000);
+                }
+            }
+            function scheduleMultiplier() {
+                if (!playing) return;
+                setTimeout(() => {
+                    if (playing && !multiplierEffectActive) spawnMultiplier();
+                    scheduleMultiplier();
+                }, 20000 + Math.random() * 15000);
+            }
+
+            // Escudo
+            function spawnShield() {
+                if (shield.show || shieldEffectActive || !playing) return;
+                shield.x = Math.random() * (canvas.width - 100) + 50;
+                shield.y = Math.random() * (canvas.height - 100) + 50;
+                shield.show = true;
+                if (shield.timer) clearTimeout(shield.timer);
+                shield.timer = setTimeout(() => { shield.show = false; }, 6000);
+            }
+            function drawShieldPowerup() {
+                if (!shield.show) return;
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(shield.x, shield.y, shield.r, 0, 2 * Math.PI);
+                ctx.strokeStyle = '#00eaff';
+                ctx.lineWidth = 3;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#00eaff';
+                ctx.stroke();
+                // Dibuja la skin actual en azul, pequeño
+                ctx.font = "38px 'Press Start 2P', monospace";
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.save();
+                ctx.globalAlpha = 0.7;
+                ctx.strokeStyle = '#00eaff';
+                ctx.lineWidth = 2.5;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#00eaff';
+                ctx.strokeText(currentSkin.type, shield.x, shield.y);
+                ctx.globalAlpha = 0.18;
+                ctx.fillStyle = '#00eaff';
+                ctx.fillText(currentSkin.type, shield.x, shield.y);
+                ctx.globalAlpha = 1;
+                ctx.restore();
+                ctx.restore();
+            }
+            function checkShieldCollision() {
+                if (!shield.show) return;
+                const dx = player.x - shield.x, dy = player.y - shield.y;
+                if (Math.hypot(dx, dy) < player.r + shield.r) {
+                    shield.show = false;
+                    if (shield.timer) clearTimeout(shield.timer);
+                    shieldEffectActive = true;
+                    shield.active = true;
+                    if (shieldEffectTimeout) clearTimeout(shieldEffectTimeout);
+                    // El escudo dura hasta que te golpean o termina la partida
+                }
+            }
+            function scheduleShield() {
+                if (!playing) return;
+                setTimeout(() => {
+                    if (playing && !shieldEffectActive) spawnShield();
+                    scheduleShield();
+                }, 25000 + Math.random() * 20000);
+            }
+
+            // Dibuja jugador
+            function drawPlayer() {
+                player.angle += 0.12;
+                ctx.save();
+                ctx.translate(player.x, player.y);
+                ctx.rotate(player.angle);
+                // Dibuja escudo con la forma de la skin, más grande y azul
+                if (shieldEffectActive) {
+                    ctx.save();
+                    ctx.font = "130px 'Press Start 2P', monospace";
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.globalAlpha = 0.7;
+                    ctx.strokeStyle = '#00eaff';
+                    ctx.lineWidth = 5;
+                    ctx.shadowBlur = 18;
+                    ctx.shadowColor = '#00eaff';
+                    ctx.strokeText(currentSkin.type, 0, 0);
+                    ctx.globalAlpha = 0.18;
+                    ctx.fillStyle = '#00eaff';
+                    ctx.fillText(currentSkin.type, 0, 0);
+                    ctx.globalAlpha = 1;
+                    ctx.restore();
+                }
+                ctx.strokeStyle = currentSkin.color;
+                ctx.lineWidth = 2;
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = currentSkin.color;
+                ctx.font = "100px 'Press Start 2P', monospace";
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.strokeText(currentSkin.type, 0, 0);
+                ctx.globalAlpha = 0.15;
+                ctx.fillStyle = currentSkin.color;
+                ctx.fillText(currentSkin.type, 0, 0);
+                ctx.globalAlpha = 1;
+                ctx.restore();
+            }
+
+            // Loop de actualización del juego
+            function update() {
+                if (!playing) return;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawPlayer();
+                drawProjectiles();
+                drawParticles();
+                drawMultiplier();
+                drawShieldPowerup();
+                checkMultiplierCollision();
+                checkShieldCollision();
+                requestAnimationFrame(update);
+            }
+
+            // Fin del juego
+            function endGame() {
+                if (godMode == false) {
+                    playing = false;
+                    gameOverEl.style.display = 'block';
+                    gameOverEl.setAttribute('aria-hidden', 'false');
+                    htmlRoot.style.cursor = 'auto';
+                } else {
+                    // Si godMode está activo, no termina el juego
+                    return;
+                }
+            }
+
+            // Eventos de entrada
+            document.addEventListener('mousemove', (e) => {
+                if (!playing) return;
+                player.x = e.clientX;
+                player.y = e.clientY;
+            });
+
+            // Controles de botones
+            playBtn.addEventListener('click', () => {
+                mainMenu.style.display = 'none';
+                scoreEl.style.display = 'inline';
+                recordEl.style.display = 'inline';
+                htmlRoot.style.cursor = 'none';
+                playing = true;
+                score = 0;
+                projectileSpeed = 15;
+                projectiles = [];
+                particles = [];
+                player = { x: canvas.width / 2, y: canvas.height / 2, r: 25, angle: 0 };
+                scoreEl.innerText = 'Puntos: 0';
+                gameOverEl.style.display = 'none';
+                updateProgressBar();
+                if (multiplier.timer) clearTimeout(multiplier.timer);
+                if (multiplierEffectTimeout) clearTimeout(multiplierEffectTimeout);
+                if (shield.timer) clearTimeout(shield.timer);
+                if (shieldEffectTimeout) clearTimeout(shieldEffectTimeout);
+                spawnProjectile();
+                scheduleMultiplier();
+                scheduleShield();
+                update();
+            });
+
+            retryBtn.addEventListener('click', () => {
+                score = 0;
+                projectileSpeed = 15;
+                projectiles = [];
+                particles = [];
+                player = { x: canvas.width / 2, y: canvas.height / 2, r: 25, angle: 0 };
+                scoreEl.innerText = 'Puntos: 0';
+                gameOverEl.style.display = 'none';
+                htmlRoot.style.cursor = 'none';
+                playing = true;
+                multiplier.show = false;
+                multiplier.active = false;
+                multiplierEffectActive = false;
+                shield.show = false;
+                shield.active = false;
+                shieldEffectActive = false;
+                if (multiplier.timer) clearTimeout(multiplier.timer);
+                if (multiplierEffectTimeout) clearTimeout(multiplierEffectTimeout);
+                if (shield.timer) clearTimeout(shield.timer);
+                if (shieldEffectTimeout) clearTimeout(shieldEffectTimeout);
+                spawnProjectile();
+                scheduleMultiplier();
+                scheduleShield();
+                updateProgressBar();
+                update();
+            });
+
+            backMenuBtn.addEventListener('click', () => {
+                location.reload();
+            });
+
+            // --- INVENTARIO LOGIC ---
+            function renderSkinsList() {
+                skinsList.innerHTML = '';
+                playerSkins.forEach((skin, idx) => {
+                    const capsule = document.createElement('div');
+                    capsule.className = 'skin-capsule' + (skin === currentSkin ? ' selected' : '');
+                    // Canvas para renderizar igual que en partida
+                    const iconCanvas = document.createElement('canvas');
+                    iconCanvas.width = 56;
+                    iconCanvas.height = 56;
+                    const iconCtx = iconCanvas.getContext('2d');
+                    iconCtx.save();
+                    iconCtx.translate(28, 28);
+                    iconCtx.strokeStyle = skin.color;
+                    iconCtx.lineWidth = 2;
+                    iconCtx.shadowBlur = 10;
+                    iconCtx.shadowColor = skin.color;
+                    iconCtx.font = "38px 'Press Start 2P', monospace";
+                    iconCtx.textAlign = 'center';
+                    iconCtx.textBaseline = 'middle';
+                    iconCtx.strokeText(skin.type, 0, 0);
+                    iconCtx.globalAlpha = 0.15;
+                    iconCtx.fillStyle = skin.color;
+                    iconCtx.fillText(skin.type, 0, 0);
+                    iconCtx.globalAlpha = 1;
+                    iconCtx.restore();
+                    capsule.appendChild(iconCanvas);
+                    capsule.title = skin.type;
+                    capsule.onclick = () => {
+                        currentSkin = skin;
+                        updateInventoryView();
+                    };
+                    skinsList.appendChild(capsule);
+                });
+            }
+            function updateInventoryView() {
+                // Skins
+                renderSkinsList();
+                // Big view
+                bigSkinView.innerHTML = '';
+                const bigCanvas = document.createElement('canvas');
+                bigCanvas.width = 180;
+                bigCanvas.height = 180;
+                const bctx = bigCanvas.getContext('2d');
+                bctx.save();
+                bctx.translate(90, 90);
+                bctx.strokeStyle = currentSkin.color;
+                bctx.lineWidth = 4;
+                bctx.shadowBlur = 24;
+                bctx.shadowColor = currentSkin.color;
+                bctx.font = "140px 'Press Start 2P', monospace";
+                bctx.textAlign = 'center';
+                bctx.textBaseline = 'middle';
+                bctx.strokeText(currentSkin.type, 0, 0);
+                bctx.globalAlpha = 0.15;
+                bctx.fillStyle = currentSkin.color;
+                bctx.fillText(currentSkin.type, 0, 0);
+                bctx.globalAlpha = 1;
+                bctx.restore();
+                bigSkinView.appendChild(bigCanvas);
+                skinName.textContent = currentSkin.type;
+                // Color picker
+                colorPicker.value = currentSkin.color;
+            }
+            // Tabs
+            function showTab(tab) {
+                if (tab === 'skins') {
+                    tabSkins.classList.add('active');
+                    tabColor.classList.remove('active');
+                    skinsPanel.style.display = '';
+                    colorPanel.style.display = 'none';
+                } else {
+                    tabSkins.classList.remove('active');
+                    tabColor.classList.add('active');
+                    skinsPanel.style.display = 'none';
+                    colorPanel.style.display = '';
+                }
+            }
+            tabSkins.addEventListener('click', () => showTab('skins'));
+            tabColor.addEventListener('click', () => showTab('color'));
+            // Abrir/cerrar inventario
+            inventoryBtn.addEventListener('click', () => {
+                inventoryModal.style.display = 'block';
+                updateInventoryView();
+                showTab('skins');
+            });
+            closeInventoryBtn.addEventListener('click', () => {
+                inventoryModal.style.display = 'none';
+            });
+            // Cambiar color
+            colorPicker.addEventListener('input', (e) => {
+                currentSkin.color = e.target.value;
+                updateInventoryView();
+            });
+            // Cambiar skin aleatoria (botón antiguo)
+            changeSkinBtn.addEventListener('click', () => {
+                let newSkin;
+                do {
+                    newSkin = playerSkins[Math.floor(Math.random() * playerSkins.length)];
+                } while (newSkin === currentSkin && playerSkins.length > 1);
+                currentSkin = newSkin;
+                updateInventoryView();
+            });
+
+            // FPS display
+            (function fpsTicker() {
+                let startTime = Date.now(), frame = 0;
+                function tick() {
+                    const time = Date.now();
+                    frame++;
+                    if (time - startTime > 1000) {
+                        document.getElementById('FPS').textContent = (frame / ((time - startTime) / 1000)).toFixed(2) + ' FPS';
+                        startTime = time;
+                        frame = 0;
+                    }
+                    window.requestAnimationFrame(tick);
+                }
+                tick();
+            })();
+
+            // Inicialización: cursor, listeners de resize
+            htmlRoot.style.cursor = 'auto';
+
+            // Si quieres que la música empiece automáticamente, intenta reproducirla con permiso:
+            const bgmusic = document.getElementById('bgmusic');
+            // muchos navegadores bloquean autoplay: solo iniciará cuando el usuario interactúe
+            document.addEventListener('click', function _playMusic() {
+                if (bgmusic && bgmusic.paused) {
+                    bgmusic.play().catch(() => { /* ignorar bloqueo de autoplay */ });
+                }
+                document.removeEventListener('click', _playMusic);
+            });
+
+            // Actualizar dimensiones internas en variables
+            window.addEventListener('resize', () => {
+                sw = canvas.width = window.innerWidth;
+                sh = canvas.height = window.innerHeight;
+                starsCanvas.width = sw;
+                starsCanvas.height = sh;
+            }, { passive: true });
+
+        });
+
+    </script>
+</body>
+
+</html>
